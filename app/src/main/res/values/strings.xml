@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">SecureRoute Keeper</string>
+    <string name="app_name">SecureRoute</string>
+    <string name="serverBase">https://secureroute.librelearn.eu.org/</string>
 </resources>
