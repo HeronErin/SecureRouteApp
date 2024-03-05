@@ -2,12 +2,18 @@ package com.github.heronerin.secureroute;
 
 import static com.github.heronerin.secureroute.Client.Mode.*;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.github.heronerin.secureroute.login.LoginActivity;
 
 public class LoginLauncher extends AppCompatActivity {
 
@@ -38,6 +44,8 @@ public class LoginLauncher extends AppCompatActivity {
                 }
                 switch (Client.instance.mode){
                     case LoggedOut:
+                        Intent i = new Intent(this, LoginActivity.class);
+                        startActivity(i);
                         break;
                     case LoggedIn:
                         break;
@@ -54,16 +62,16 @@ public class LoginLauncher extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         Client.getOrInit(this);
         UserState.updateNetwork(this);
         handleRefresh();
         ((SwipeRefreshLayout)findViewById(R.id.swiperefresh)).setOnRefreshListener(this::handleRefresh);
 
-//        Toast.makeText(this, "Test", Toast.LENGTH_SHORT).show();
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-//            return insets;
-//        });
     }
 }
