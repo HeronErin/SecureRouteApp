@@ -46,6 +46,7 @@ dependencies {
     implementation libs.okhttp
     implementation libs.swiperefreshlayout
     implementation libs.okhttp.urlconnection
+    implementation libs.material.v190
 //    implementation libs.persistent.cookie.jar.okhttp
 //    implementation libs.PersistentCookieJar
 

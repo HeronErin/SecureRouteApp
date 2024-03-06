@@ -8,7 +8,7 @@
     tools:context=".login.NewUserActivity">
 
     <EditText
-        android:id="@+id/tpinEnter"
+        android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="165dp"
@@ -31,9 +31,9 @@
         android:hint="Enter username"
         android:inputType="text"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="@+id/tpinEnter"
-        app:layout_constraintStart_toStartOf="@+id/tpinEnter"
-        app:layout_constraintTop_toBottomOf="@+id/tpinEnter" />
+        app:layout_constraintEnd_toEndOf="@+id/userName"
+        app:layout_constraintStart_toStartOf="@+id/userName"
+        app:layout_constraintTop_toBottomOf="@+id/userName" />
 
     <TextView
         android:id="@+id/TempPinInput"

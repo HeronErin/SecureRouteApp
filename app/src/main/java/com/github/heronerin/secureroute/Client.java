@@ -1,35 +1,45 @@
 package com.github.heronerin.secureroute;
 
+import static com.github.heronerin.secureroute.Client.Mode.LoggedIn;
 import static com.github.heronerin.secureroute.Client.Mode.LoggedOut;
+import static com.github.heronerin.secureroute.Client.Mode.NeedsInit;
 
 import static java.net.CookiePolicy.ACCEPT_ALL;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
 import okhttp3.JavaNetCookieJar;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.BufferedSink;
 
 public class Client {
     public static Client instance = null;
-
 
     public enum Mode{
         LoggedOut,
@@ -41,7 +51,7 @@ public class Client {
     private boolean isServerAlive;
     public boolean isServerAlive(){return isServerAlive;};
     public final String URL;
-    private String name;
+    public String name;
 
 //    private synchronized CookieManager cookieManager = new CookieManager();
 
@@ -50,7 +60,7 @@ public class Client {
     private boolean allowOnData;
     public boolean allowOnData(){return allowOnData;}
 
-    private OkHttpClient http;
+    public OkHttpClient http;
 
     CookieManager cookieManager;
     JavaNetCookieJar cookieJar;
@@ -85,6 +95,8 @@ public class Client {
         if (name == null){
             mode = LoggedOut;
         }
+        mode = Mode.valueOf(sharedPref.getString("mode", LoggedOut.toString()));
+
         http = new OkHttpClient.Builder()
                 .cookieJar(cookieJar)
                 .build();
@@ -94,11 +106,9 @@ public class Client {
         if ((allowOnData && UserState.haveConnectedMobile) || UserState.haveConnectedWifi){
             checkServer();
         }
-//        Runtime.getRuntime().addShutdownHook(new Thread(this::flushCookies));
-
     }
     public Thread serverCheck = null;
-    void flushCookies(){
+    public void flushCookies(){
         List<URI> uris = cookieManager.getCookieStore().getURIs();
         JSONArray sites = new JSONArray();
         for (int i = 0; i < uris.size(); i++){
@@ -116,6 +126,7 @@ public class Client {
         }
         SharedPreferences.Editor e = sharedPref.edit();
         e.putString("client cookies", sites.toString());
+        e.putString("mode", mode.toString());
         e.apply();
     }
     Thread checkServer(){
@@ -130,7 +141,7 @@ public class Client {
             } catch (IOException e) {
                 isServerAlive = false;
             }
-//            flushCookies();
+//            flushCookie();
 
             
         });
@@ -143,5 +154,176 @@ public class Client {
             instance = new Client(context);
         return instance;
     }
+    public void handleTpinLogin(AppCompatActivity context, String tpin, String name){
+        try {
+            JSONObject input = new JSONObject();
+            input.put("mode", "tpin");
+            input.put("pin", tpin);
+            input.put("name", name);
+            Request request = new Request.Builder()
+                    .url(Client.instance.URL + "auth")
+                    .post(new RequestBody() {
+                        @Nullable
+                        @Override
+                        public MediaType contentType() {
+                            return MediaType.get("application/json");
+                        }
+                        @Override
+                        public void writeTo(@NonNull BufferedSink bufferedSink) throws IOException {
+                            bufferedSink.write(input.toString().getBytes(StandardCharsets.UTF_8));
+                        }
+                    })
+                    .build();
+            try (Response response = Client.instance.http.newCall(request).execute()) {
+                Client.instance.flushCookies();
+
+                assert response.body() != null;
+                JSONObject jsonObject = new JSONObject(response.body().string());
+
+                if (jsonObject.getString("result").equals("failure")){
+                    context.runOnUiThread(()-> {
+                        Toast.makeText(context, "Login not recognized", Toast.LENGTH_LONG).show();
+                        context.findViewById(R.id.pinEnterBtn).setVisibility(View.VISIBLE);
+                    });
+                    return;
+                }
+                if (jsonObject.getString("mode").equals("creation")){
+                    SharedPreferences.Editor e = sharedPref.edit();
+                    name = jsonObject.getString("name");
+                    e.putString("name", name);
+                    mode = NeedsInit;
+                    e.putString("mode", mode.toString());
+                    e.apply();
+                    Intent i = new Intent(context, LoginLauncher.class);
+                    context.startActivity(i);
+                }
+
+            } catch (AssertionError | JSONException | IOException e) {
+                e.printStackTrace();
+                context.runOnUiThread(()->{
+                    context.findViewById(R.id.pinEnterBtn).setVisibility(View.VISIBLE);
+
+                    Toast.makeText(context, "Request error", Toast.LENGTH_LONG).show();
+                });
+            }
+
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void handleLogin(AppCompatActivity context, String username, String password){
+        try {
+            JSONObject input = new JSONObject();
+            input.put("mode", "uauth");
+            input.put("password", hashPass(password));
+            input.put("name", name);
+            Request request = new Request.Builder()
+                    .url(Client.instance.URL + "auth")
+                    .post(new RequestBody() {
+                        @Nullable
+                        @Override
+                        public MediaType contentType() {
+                            return MediaType.get("application/json");
+                        }
+                        @Override
+                        public void writeTo(@NonNull BufferedSink bufferedSink) throws IOException {
+                            bufferedSink.write(input.toString().getBytes(StandardCharsets.UTF_8));
+                        }
+                    })
+                    .build();
+            try (Response response = Client.instance.http.newCall(request).execute()) {
+                Client.instance.flushCookies();
+
+                assert response.body() != null;
+                JSONObject jsonObject = new JSONObject(response.body().string());
+
+                if (jsonObject.getString("result").equals("failure")){
+                    context.runOnUiThread(()-> {
+                        Toast.makeText(context, "Login not recognized", Toast.LENGTH_LONG).show();
+                        context.findViewById(R.id.userLoginBtn).setVisibility(View.VISIBLE);
+                    });
+                    return;
+                }
+                if (jsonObject.getString("mode").equals("loggedin")){
+                    SharedPreferences.Editor e = sharedPref.edit();
+                    name = jsonObject.getString("name");
+                    e.putString("name", name);
+                    mode = LoggedIn;
+                    e.putString("mode", mode.toString());
+                    e.apply();
+                    Intent i = new Intent(context, LoginLauncher.class);
+                    context.startActivity(i);
+                }
+
+            } catch (AssertionError | JSONException | IOException e) {
+                e.printStackTrace();
+                context.runOnUiThread(()->{
+                    context.findViewById(R.id.userLoginBtn).setVisibility(View.VISIBLE);
+
+                    Toast.makeText(context, "Request error", Toast.LENGTH_LONG).show();
+                });
+            }
+
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void handleNewPass(AppCompatActivity context, String hash) {
+        try {
+            JSONObject input = new JSONObject();
+            input.put("password", hash);
+            Request request = new Request.Builder()
+                    .url(Client.instance.URL + "init")
+                    .post(new RequestBody() {
+                        @Nullable
+                        @Override
+                        public MediaType contentType() {
+                            return MediaType.get("application/json");
+                        }
+                        @Override
+                        public void writeTo(@NonNull BufferedSink bufferedSink) throws IOException {
+                            bufferedSink.write(input.toString().getBytes(StandardCharsets.UTF_8));
+                        }
+                    })
+                    .build();
+            Response response = Client.instance.http.newCall(request).execute();
+            JSONObject output = new JSONObject(response.body().string());
+            if (output.getString("result").equals("failure")){
+                context.runOnUiThread(()->Toast.makeText(context, "Issue logging in, your account may have already been created", Toast.LENGTH_LONG).show());
+                response.close();
+                return;
+            }
+            mode = LoggedIn;
+            flushCookies();
+
+            Intent i = new Intent(context, LoginLauncher.class);
+            context.startActivity(i);
+
+            response.close();
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            context.runOnUiThread(()->Toast.makeText(context, "Network issue", Toast.LENGTH_LONG).show());
+        }
+
+    }
+    public static String hashPass(String s){
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] sha = digest.digest(s.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : sha) {
+                sb.append(String.format("%02X ", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
+

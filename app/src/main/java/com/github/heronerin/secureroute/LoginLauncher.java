@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.github.heronerin.secureroute.login.EnterPwd;
 import com.github.heronerin.secureroute.login.LoginActivity;
 
 public class LoginLauncher extends AppCompatActivity {
@@ -32,13 +33,13 @@ public class LoginLauncher extends AppCompatActivity {
                 ((SwipeRefreshLayout)findViewById(R.id.swiperefresh)).setRefreshing(false);
                 TextView tv = findViewById(R.id.mainMenuText);
 
-                if (Client.instance.mode == LoggedOut && !(UserState.haveConnectedWifi || (
+                if ((Client.instance.mode == NeedsInit || Client.instance.mode == LoggedOut) && !(UserState.haveConnectedWifi || (
                         UserState.haveConnectedMobile && Client.instance.allowOnData()
                 ))){
                     tv.setText("Error: Internet not available, and required for logging in.");
                     return;
                 }
-                if (!Client.instance.isServerAlive() && Client.instance.mode == LoggedOut){
+                if ((Client.instance.mode == NeedsInit || Client.instance.mode == LoggedOut) && !Client.instance.isServerAlive()){
                     tv.setText("Error: User needs logged in, but the server can't be contacted.");
                     return;
                 }
@@ -48,9 +49,11 @@ public class LoginLauncher extends AppCompatActivity {
                         startActivity(i);
                         break;
                     case LoggedIn:
+                        tv.setText("SHIT IT WORKED");
                         break;
                     case NeedsInit:
-                        break;
+                        Intent ii = new Intent(this, EnterPwd.class);
+                        startActivity(ii);
                 }
 
             });
