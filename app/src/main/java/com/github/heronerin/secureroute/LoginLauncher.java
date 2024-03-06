@@ -1,6 +1,7 @@
 package com.github.heronerin.secureroute;
 
 import static com.github.heronerin.secureroute.Client.Mode.*;
+import static com.github.heronerin.secureroute.interactions.Interaction.patchLevel;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +16,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.heronerin.secureroute.login.EnterPwd;
 import com.github.heronerin.secureroute.login.LoginActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LoginLauncher extends AppCompatActivity {
 
@@ -75,6 +79,17 @@ public class LoginLauncher extends AppCompatActivity {
         UserState.updateNetwork(this);
         handleRefresh();
         ((SwipeRefreshLayout)findViewById(R.id.swiperefresh)).setOnRefreshListener(this::handleRefresh);
+
+        try {
+            System.out.println(
+                    patchLevel(
+                            new JSONObject("{\"a\":{\"c\":69}}"), // Patch statement
+                            new JSONObject("{}")  // Output
+                    )
+                            .toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }

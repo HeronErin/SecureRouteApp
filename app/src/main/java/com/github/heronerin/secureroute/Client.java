@@ -55,7 +55,7 @@ public class Client {
 
 //    private synchronized CookieManager cookieManager = new CookieManager();
 
-    private SharedPreferences sharedPref;
+    public SharedPreferences sharedPref;
 
     private boolean allowOnData;
     public boolean allowOnData(){return allowOnData;}
@@ -222,7 +222,7 @@ public class Client {
         try {
             JSONObject input = new JSONObject();
             input.put("mode", "uauth");
-            input.put("password", hashPass(password));
+            input.put("password", hashPass(hashPass(password))); // We double sha the password, this way the first hash can be used an an encryption key, and the second for auth
             input.put("name", username);
             Request request = new Request.Builder()
                     .url(Client.instance.URL + "auth")
@@ -324,14 +324,32 @@ public class Client {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] sha = digest.digest(s.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : sha) {
-                sb.append(String.format("%02X ", b));
-            }
-            return sb.toString();
+            return encodeHexString(sha);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String encodeHexString(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = String.format("%02x", b);
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    public static byte[] decodeHexString(String hexString) throws IllegalArgumentException {
+        if (hexString.length() % 2 != 0) {
+            throw new IllegalArgumentException("Invalid hexadecimal string");
+        }
+
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int i = 0; i < hexString.length(); i += 2) {
+            String hex = hexString.substring(i, i + 2);
+            bytes[i / 2] = (byte) Integer.parseInt(hex, 16);
+        }
+        return bytes;
     }
 
 }

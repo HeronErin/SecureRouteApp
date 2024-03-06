@@ -1,6 +1,7 @@
 package com.github.heronerin.secureroute.login;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.TextView;
@@ -44,8 +45,13 @@ public class EnterPwd extends AppCompatActivity {
                 Toast.makeText(this, "Password needs to be at least 5 long", Toast.LENGTH_LONG).show();
                 return;
             }
+            // We double sha the password, this way the first hash can be used an an encryption key, and the second for auth
             String hash = Client.hashPass(textView.getText().toString());
-            new Thread(()->Client.instance.handleNewPass(this, hash)).start();
+            SharedPreferences.Editor e = Client.instance.sharedPref.edit();
+            e.putString("key", hash);
+            e.apply();
+
+            new Thread(()->Client.instance.handleNewPass(this, Client.hashPass(hash))).start();
 
         });
     }

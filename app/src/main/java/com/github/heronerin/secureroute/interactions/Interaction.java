@@ -18,17 +18,27 @@ import java.util.Iterator;
     Then are parsed into proper SecureRoute events.
  */
 
-public abstract class Interaction {
+public class Interaction {
     public static enum InteractionVariety{
         INTERACTION,
         INTERACTION_REVISION
     }
-    abstract InteractionVariety getVariety();
-    abstract JSONObject getJson();
-    abstract void setJson(JSONObject jsonObject);
+    private JSONObject jsonObject;
+    private InteractionVariety variety;
+    Interaction(JSONObject _jsonObject, InteractionVariety _variety){
+        jsonObject = _jsonObject;
+        variety = _variety;
+    }
 
 
-    private JSONObject patchLevel(JSONObject patchFrom, JSONObject patchTo) throws JSONException {
+    InteractionVariety getVariety(){ return variety; }
+    JSONObject getJson(){ return jsonObject; }
+    void setJson(JSONObject _jsonObject){
+        jsonObject=_jsonObject;
+    }
+
+
+    public static JSONObject patchLevel(JSONObject patchFrom, JSONObject patchTo) throws JSONException {
         for (Iterator<String> it = patchFrom.keys(); it.hasNext(); ) {
             String key = it.next();
             if (patchFrom.get(key) instanceof JSONObject
@@ -43,12 +53,12 @@ public abstract class Interaction {
     }
 
     // This only works for INTERACTION_REVISION
-    public void patch(Interaction other) throws JSONException {
-        JSONObject base = other.getJson();
-        assert(getVariety() == INTERACTION_REVISION);
-        assert(other.getVariety() == INTERACTION);
-        assert(this.getJson() != null);
-        assert(other.getJson() != null);
+    public void patch(Interaction other) throws JSONException, NullPointerException {
+        if (getVariety() != INTERACTION_REVISION || other.getVariety() != INTERACTION)
+            throw new VerifyError("Incorrect use of patch, must be called on INTERACTION_REVISION with a normal INTERACTION as the argument");
+
+        if (this.getJson() == null || other.getJson() == null)
+            throw new NullPointerException("One or both of the Interactions have no Json!");
 
         other.setJson(
                 patchLevel(this.getJson(), other.getJson())
