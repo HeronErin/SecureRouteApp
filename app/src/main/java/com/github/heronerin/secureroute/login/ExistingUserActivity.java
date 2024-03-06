@@ -33,8 +33,8 @@ public class ExistingUserActivity extends AppCompatActivity {
         findViewById(R.id.userLoginBtn).setOnClickListener((v)->{
             new Thread(()->Client.instance.handleLogin(
                     this,
-                    ((EditText) findViewById(R.id.userName)).getText().toString(),
-                    ((EditText) findViewById(R.id.userPassword)).getText().toString()
+                    ((EditText) findViewById(R.id.ExistingUserName)).getText().toString(),
+                    ((EditText) findViewById(R.id.ExistingUserPassword)).getText().toString()
                     )).start();
             findViewById(R.id.userLoginBtn).setVisibility(View.INVISIBLE);
         });

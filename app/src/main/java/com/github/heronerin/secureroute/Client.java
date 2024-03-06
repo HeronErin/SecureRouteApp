@@ -134,10 +134,14 @@ public class Client {
 
         serverCheck =  new Thread(() -> {
             Request request = new Request.Builder()
-                    .url(URL + "generate_204")
+                    .url(URL + "connection_test")
                     .build();
             try (Response response = http.newCall(request).execute()) {
-                isServerAlive = response.code() == 204;
+                isServerAlive = response.code() == 204 || response.code() == 203;
+                if (response.code() == 203 && mode == LoggedIn){
+                    mode = LoggedOut;
+                    flushCookies();
+                }
             } catch (IOException e) {
                 isServerAlive = false;
             }
@@ -195,7 +199,9 @@ public class Client {
                     e.putString("mode", mode.toString());
                     e.apply();
                     Intent i = new Intent(context, LoginLauncher.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     context.startActivity(i);
+                    context.finish();
                 }
 
             } catch (AssertionError | JSONException | IOException e) {
@@ -217,7 +223,7 @@ public class Client {
             JSONObject input = new JSONObject();
             input.put("mode", "uauth");
             input.put("password", hashPass(password));
-            input.put("name", name);
+            input.put("name", username);
             Request request = new Request.Builder()
                     .url(Client.instance.URL + "auth")
                     .post(new RequestBody() {
@@ -253,7 +259,9 @@ public class Client {
                     e.putString("mode", mode.toString());
                     e.apply();
                     Intent i = new Intent(context, LoginLauncher.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     context.startActivity(i);
+                    context.finish();
                 }
 
             } catch (AssertionError | JSONException | IOException e) {
@@ -300,8 +308,9 @@ public class Client {
             flushCookies();
 
             Intent i = new Intent(context, LoginLauncher.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             context.startActivity(i);
-
+            context.finish();
             response.close();
 
         } catch (JSONException e) {
