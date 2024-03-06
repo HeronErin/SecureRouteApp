@@ -17,22 +17,8 @@
         android:theme="@style/Theme.SecureRouteKeeper"
         tools:targetApi="31">
         <activity
-            android:name=".login.EnterPwd"
-            android:exported="false" />
-        <activity
-            android:name=".login.ExistingUserActivity"
-            android:exported="false" />
-        <activity
-            android:name=".login.NewUserActivity"
-            android:exported="false"
-            android:theme="@style/Theme.SecureRouteKeeper" />
-        <activity
-            android:name=".login.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LoginLauncher"
-            android:exported="true"
-            android:noHistory="true">
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
