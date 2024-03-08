@@ -8,18 +8,86 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/lineItemBtn"
+            style="@style/Widget.AppCompat.ImageButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:layout_weight="1"
-            app:srcCompat="@android:drawable/ic_menu_add" />
+            android:background="@android:color/transparent"
+            android:padding="5sp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/list_icon"
+            android:translationY="25sp"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/statsBtn"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="5sp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/graph_up"
+            android:translationY="25sp"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/addBtn"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:layout_weight="1.3"
+            android:background="@android:color/transparent"
+            android:padding="5sp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/add_icon"
+            android:translationY="5dp"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/settingBtn"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="5sp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/gear_icon"
+            android:translationY="25sp"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/uploadBtn"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="5sp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/upload_icon"
+            android:translationY="25sp"
+            android:visibility="visible" />
     </LinearLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/tabFragmentContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

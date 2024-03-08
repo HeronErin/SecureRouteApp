@@ -6,4 +6,7 @@
     </style>
 
     <style name="Theme.SecureRouteKeeper" parent="Base.Theme.SecureRouteKeeper" />
+
+    <color name="dark_maybe">#FF000000</color>
+    <color name="white_maybe">#FFFFFFFF</color>
 </resources>

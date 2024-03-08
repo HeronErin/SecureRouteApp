@@ -4,4 +4,6 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
+    <color name="dark_maybe">#FFFFFFFF</color>
+    <color name="white_maybe">#FF000000</color>
 </resources>
