@@ -4,42 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tabs.AddFragment" >
+    tools:context=".tabs.addPages.GasFillUpFragment" >
 
-    <Spinner
-        android:id="@+id/addType"
-        android:layout_width="409dp"
+    <EditText
+        android:id="@+id/odometer"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:background="#9F9F9F"
-        android:padding="5dp"
-        android:spinnerMode="dropdown"
+        android:ems="10"
+        android:hint="Enter Odometer"
+        android:inputType="number"
+        android:textAlignment="viewStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Spinner
-        android:id="@+id/addSubType"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:background="#9F9F9F"
-        android:padding="5dp"
-        android:spinnerMode="dropdown"
-        app:layout_constraintEnd_toEndOf="@+id/addType"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addType" />
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/addFieldHolder"
+    <EditText
+        android:id="@+id/editTextNumberDecimal"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:ems="10"
+        android:hint="Enter Cost"
+        android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addSubType" />
+        app:layout_constraintTop_toBottomOf="@+id/odometer" />
+
+    <Button
+        android:id="@+id/addImg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/add_an_image_s"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
