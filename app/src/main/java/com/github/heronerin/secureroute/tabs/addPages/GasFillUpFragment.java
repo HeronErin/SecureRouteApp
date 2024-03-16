@@ -51,4 +51,7 @@ public class GasFillUpFragment extends AbstractAddPage {
 
     }
 
+    @Override
+    public void setMode(int index) { }
+
 }

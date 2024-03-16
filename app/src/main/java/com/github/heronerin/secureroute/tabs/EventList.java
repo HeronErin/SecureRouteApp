@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,11 @@ import android.widget.ListView;
 
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.interactions.Event;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class EventList extends Fragment {
     EventArrayAdapter eventArrayAdapter;
@@ -30,8 +34,20 @@ public class EventList extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        DataBase db = DataBase.getOrCreate(this.getContext());
+
+        List<Event> eventList = db.getEventsByTime(100, true);
+        List<Event> rangeList = db.getRange(100, true);
+
+        Event.applyRanges(eventList, rangeList);
+
+        List<Event> filteredEventList = new ArrayList<>();
+        for (Event event : eventList)
+            if (!Event.isRangeEnd(event.variety))
+                filteredEventList.add(event);
+
         eventArrayAdapter = new EventArrayAdapter(this.getContext(),
-                DataBase.getOrCreate(this.getContext()).getEventsByTime(100, true)
+                filteredEventList
         );
     }
 

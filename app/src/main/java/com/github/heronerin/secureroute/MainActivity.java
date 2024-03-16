@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             if (!doReset)
                 return;
             v = findViewById(R.id.lineItemBtn);
+
             // Or else AddFragment get corrupted... Likely due to the fragment on AddFragment gets removed
             fragments[2] = AddFragment.newInstance();
 

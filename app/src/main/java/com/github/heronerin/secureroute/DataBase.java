@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.interactions.Event;
 
@@ -41,6 +44,7 @@ public class DataBase extends SQLiteOpenHelper {
         new File(databaseUri).mkdirs();
         new File(picturesUri).mkdirs();
         events.mkdirs();
+
     }
 
     @Override
@@ -54,6 +58,24 @@ public class DataBase extends SQLiteOpenHelper {
                 "associated_pair INTEGER," +
                 "note_data TEXT," +
                 "image_uri TEXT);");
+    }
+    private static String StringPlaceHolderGen(int amount){
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean isFirst = true;
+        while(amount-- != 0){
+            if (!isFirst)
+                stringBuilder.append(", ");
+            stringBuilder.append("?");
+            isFirst = false;
+        }
+        return stringBuilder.toString();
+    }
+    public void customEventSaveHandler(Event event, long id, SQLiteDatabase db){
+        if (event.variety == Event.EventVariety.ArbitraryRangeEnd){
+            ContentValues values = new ContentValues();
+            values.put("associated_pair", (int) id);
+            db.update("events", values, "id = ?", new String[]{String.valueOf(event.associatedPair)});
+        }
     }
 
     public synchronized void addEvent(Event event) {
@@ -74,32 +96,38 @@ public class DataBase extends SQLiteOpenHelper {
             if (event.imageUri != null)
                 values.put("image_uri", event.imageUri.toString());
 
-            db.insert("events", null, values);
+            long id = db.insert("events", null, values);
+            customEventSaveHandler(event, id, db);
+
         } finally {
             if (db != null) {
                 db.close();
             }
         }
     }
-    public synchronized List<Event> getEventsByTime(int limit, boolean reverse){
+    private Event eventFromCursor(Cursor cursor) throws JSONException {
+        Event event = new Event(
+                Event.EventVariety.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("variety"))),
+                UUID.fromString(cursor.getString(cursor.getColumnIndexOrThrow("event_id"))),
+                cursor.getLong(cursor.getColumnIndexOrThrow("timestamp")),
+                cursor.getDouble(cursor.getColumnIndexOrThrow("expense_value")),
+                cursor.getInt(cursor.getColumnIndexOrThrow("associated_pair")),
+                cursor.getString(cursor.getColumnIndexOrThrow("note_data")),
+                cursor.getString(cursor.getColumnIndexOrThrow("image_uri")) != null ? new JSONArray(cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))) : null
+        );
+        event.databaseId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+        return event;
+    }
+    private synchronized List<Event> eventsBySql(String sql, @Nullable String[] args, int limit){
         List<Event> recentEvents = new ArrayList<>();
         SQLiteDatabase db = null;
         Cursor cursor = null;
         try {
             db = this.getReadableDatabase();
-            cursor = db.rawQuery("SELECT * FROM events ORDER BY timestamp " + (reverse ? "DESC" : "ASC"), null);
+            cursor = db.rawQuery(sql, args);
             if (cursor.moveToFirst()) {
                 do {
-                    Event event = new Event(
-                            Event.EventVariety.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("variety"))),
-                            UUID.fromString(cursor.getString(cursor.getColumnIndexOrThrow("event_id"))),
-                            cursor.getLong(cursor.getColumnIndexOrThrow("timestamp")),
-                            cursor.getDouble(cursor.getColumnIndexOrThrow("expense_value")),
-                            cursor.getInt(cursor.getColumnIndexOrThrow("associated_pair")),
-                            cursor.getString(cursor.getColumnIndexOrThrow("note_data")),
-                            cursor.getString(cursor.getColumnIndexOrThrow("image_uri")) != null ? new JSONArray(cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))) : null
-                    );
-                    recentEvents.add(event);
+                    recentEvents.add(eventFromCursor(cursor));
                 } while (cursor.moveToNext() && 0!=--limit);
             }
         } catch (JSONException e) {
@@ -114,6 +142,21 @@ public class DataBase extends SQLiteOpenHelper {
         }
         return recentEvents;
     }
+    public List<Event> getEventsByTime(int limit, boolean reverse){
+        return eventsBySql("SELECT * FROM events ORDER BY timestamp " + (reverse ? "DESC" : "ASC"), null, limit);
+    }
+    public List<Event> getRange(int limit, boolean reverse){
+        return eventsBySql("SELECT * FROM events " +
+                "WHERE variety IN (" +  StringPlaceHolderGen(Event.possibleRangeStrings.length)+ ") "+
+                "ORDER BY timestamp " + (reverse ? "DESC" : "ASC"), Event.possibleRangeStrings, limit);
+    }
+    public List<Event> getUnEndedRanges(int limit, boolean reverse){
+        return eventsBySql("SELECT * FROM events " +
+                "WHERE (variety IN (" +  StringPlaceHolderGen(Event.possibleRangeStrings.length)+ ") "+
+                "AND associated_pair = -1 ) "+
+                "ORDER BY timestamp " + (reverse ? "DESC" : "ASC"), Event.possibleRangeStrings, limit);
+    }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

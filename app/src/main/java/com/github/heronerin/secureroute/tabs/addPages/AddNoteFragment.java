@@ -52,6 +52,9 @@ public class AddNoteFragment extends AbstractAddPage {
     }
 
     @Override
+    public void setMode(int index) { }
+
+    @Override
     public Event genValidEvent() {
         JSONArray jsonArray = new JSONArray();
         if (usingImages){

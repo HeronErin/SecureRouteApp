@@ -11,4 +11,6 @@ public abstract class AbstractAddPage extends Fragment {
     public abstract Event genValidEvent();
 
     public abstract void clearStorage();
+
+    public abstract void setMode(int index);
 }
