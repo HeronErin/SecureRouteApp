@@ -2,13 +2,20 @@ package com.github.heronerin.secureroute;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.github.heronerin.secureroute.interactions.Event;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class DataBase extends SQLiteOpenHelper {
     public static DataBase instance = null;
@@ -71,6 +78,38 @@ public class DataBase extends SQLiteOpenHelper {
                 db.close();
             }
         }
+    }
+    public synchronized List<Event> getEventsByTime(int limit, boolean reverse){
+        List<Event> recentEvents = new ArrayList<>();
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = this.getReadableDatabase();
+            cursor = db.rawQuery("SELECT * FROM events ORDER BY timestamp " + (reverse ? "DESC" : "ASC"), null);
+            if (cursor.moveToFirst() && 0!=(limit-=1)) {
+                do {
+                    Event event = new Event(
+                            Event.EventVariety.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("variety"))),
+                            UUID.fromString(cursor.getString(cursor.getColumnIndexOrThrow("event_id"))),
+                            cursor.getLong(cursor.getColumnIndexOrThrow("timestamp")),
+                            cursor.getDouble(cursor.getColumnIndexOrThrow("expense_value")),
+                            cursor.getString(cursor.getColumnIndexOrThrow("note_data")),
+                            cursor.getString(cursor.getColumnIndexOrThrow("image_uri")) != null ? new JSONArray(cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))) : null
+                    );
+                    recentEvents.add(event);
+                } while (cursor.moveToNext());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+        return recentEvents;
     }
 
     @Override
