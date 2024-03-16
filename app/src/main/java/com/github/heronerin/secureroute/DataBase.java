@@ -51,6 +51,7 @@ public class DataBase extends SQLiteOpenHelper {
                 "event_id UUID NOT NULL," +
                 "timestamp BIGINT NOT NULL, " +
                 "expense_value DOUBLE PRECISION," +
+                "associated_pair INTEGER," +
                 "note_data TEXT," +
                 "image_uri TEXT);");
     }
@@ -64,6 +65,7 @@ public class DataBase extends SQLiteOpenHelper {
             values.put("variety", event.variety.toString());
             values.put("event_id", event.eventId.toString());
             values.put("timestamp", event.timeStamp);
+            values.put("associated_pair", event.associatedPair);
             values.put("expense_value", event.expenseValue);
 
             if (event.noteData != null)
@@ -86,18 +88,19 @@ public class DataBase extends SQLiteOpenHelper {
         try {
             db = this.getReadableDatabase();
             cursor = db.rawQuery("SELECT * FROM events ORDER BY timestamp " + (reverse ? "DESC" : "ASC"), null);
-            if (cursor.moveToFirst() && 0!=(limit-=1)) {
+            if (cursor.moveToFirst()) {
                 do {
                     Event event = new Event(
                             Event.EventVariety.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("variety"))),
                             UUID.fromString(cursor.getString(cursor.getColumnIndexOrThrow("event_id"))),
                             cursor.getLong(cursor.getColumnIndexOrThrow("timestamp")),
                             cursor.getDouble(cursor.getColumnIndexOrThrow("expense_value")),
+                            cursor.getInt(cursor.getColumnIndexOrThrow("associated_pair")),
                             cursor.getString(cursor.getColumnIndexOrThrow("note_data")),
                             cursor.getString(cursor.getColumnIndexOrThrow("image_uri")) != null ? new JSONArray(cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))) : null
                     );
                     recentEvents.add(event);
-                } while (cursor.moveToNext());
+                } while (cursor.moveToNext() && 0!=--limit);
             }
         } catch (JSONException e) {
             e.printStackTrace();

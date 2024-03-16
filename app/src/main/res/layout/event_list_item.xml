@@ -6,7 +6,7 @@
     android:layout_height="60dp">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/typeIcon"
         android:layout_width="30dp"
         android:layout_height="0dp"
         android:scaleType="fitCenter"
@@ -16,16 +16,16 @@
         app:srcCompat="@drawable/note_icon" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textPreview"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="5dp"
         android:text="Some important preview text the user must see to understand..."
         android:textColor="@android:color/darker_gray"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        app:layout_constraintBottom_toTopOf="@+id/dateTimeText"
         app:layout_constraintEnd_toStartOf="@+id/rangeBars"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/typeIcon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
@@ -71,7 +71,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/dateTimeText"
         android:layout_width="wrap_content"
         android:layout_height="11dp"
         android:layout_marginStart="5dp"
@@ -79,6 +79,6 @@
         android:textColor="@android:color/darker_gray"
         android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView" />
+        app:layout_constraintStart_toEndOf="@+id/typeIcon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -50,10 +50,12 @@ public class MainActivity extends AppCompatActivity {
             if (!doReset)
                 return;
             v = findViewById(R.id.lineItemBtn);
+            // Or else AddFragment get corrupted... Likely due to the fragment on AddFragment gets removed
+            fragments[2] = AddFragment.newInstance();
 
         }
-        if (v.getId() == currentTab)
-            return;
+//        if (v.getId() == currentTab)
+//            return;
         if (currentTab != 0)
             ((ImageButton) findViewById(currentTab)).clearColorFilter();
         if (v.getId() != R.id.addBtn)
@@ -62,17 +64,16 @@ public class MainActivity extends AppCompatActivity {
             ((ImageButton) v).setColorFilter(Color.rgb(0xFF, 0xA5, 0));
         currentTab = v.getId();
 
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+
         for(int i = 0; i < btns.length; i++){
             if (btns[i] == v.getId()){
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.tabFragmentContainer, fragments[i])
                         .commit();
+                break;
             }
         }
-
-        fragmentTransaction.commit();
     }
 
 

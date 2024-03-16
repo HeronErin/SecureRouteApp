@@ -63,6 +63,7 @@ public class AddNoteFragment extends AbstractAddPage {
                 UUID.randomUUID(),
                 System.currentTimeMillis(),
                 0,
+                -1,
                 ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
                 jsonArray
         );

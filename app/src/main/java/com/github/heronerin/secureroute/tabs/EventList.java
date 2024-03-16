@@ -31,7 +31,7 @@ public class EventList extends Fragment {
         super.onCreate(savedInstanceState);
 
         eventArrayAdapter = new EventArrayAdapter(this.getContext(),
-                DataBase.getOrCreate(this.getContext()).getEventsByTime(100, false)
+                DataBase.getOrCreate(this.getContext()).getEventsByTime(100, true)
         );
     }
 

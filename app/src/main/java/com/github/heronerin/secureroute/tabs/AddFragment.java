@@ -38,7 +38,8 @@ public class AddFragment extends Fragment {
             "Addition type",
             "Gas fill up",
             "Millage tracking",
-            "Expense"
+            "Expense",
+            "Range"
     };
     int currentCategory = 0;
 
@@ -127,8 +128,7 @@ public class AddFragment extends Fragment {
             Toast.makeText(this.getContext(), "Added page to DB", Toast.LENGTH_LONG).show();
             currentPage.clearStorage();
 
-            addPages = getPages();
-            updateSubCategory();
+
             return true;
 
         }
