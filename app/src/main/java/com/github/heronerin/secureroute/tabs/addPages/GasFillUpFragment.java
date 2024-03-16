@@ -9,9 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.interactions.Event;
+
+import org.json.JSONObject;
 
 
-public class GasFillUpFragment extends Fragment {
+public class GasFillUpFragment extends AbstractAddPage {
     public GasFillUpFragment() {
         // Required empty public constructor
     }
@@ -32,4 +35,20 @@ public class GasFillUpFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_gas_fill_up, container, false);
     }
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
+
+    @Override
+    public Event genValidEvent() {
+        return null;
+    }
+
+    @Override
+    public void clearStorage() {
+
+    }
+
 }

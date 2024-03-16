@@ -1,6 +1,11 @@
 package com.github.heronerin.secureroute;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -8,13 +13,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
+import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,12 +32,34 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImageViewerFragment extends Fragment {
+    public static Uri swapUriScheme(Uri uri, String newScheme) {
+        if (uri == null || newScheme == null) {
+            return uri;
+        }
+
+        String oldScheme = uri.getScheme();
+        if (oldScheme == null || oldScheme.equals(newScheme)) {
+            return uri;
+        }
+
+        String uriString = uri.toString();
+        return Uri.parse(uriString.replaceFirst(oldScheme + ":", newScheme + ":"));
+    }
+
     static class ImgTitleCombo{
         String img;
         String title;
@@ -41,28 +73,106 @@ public class ImageViewerFragment extends Fragment {
 
         private Context mContext;
         private List<ImgTitleCombo> moviesList = new ArrayList<>();
+        ImageViewerFragment imageViewerFragment;
 
-        public ImageAdaptor(@NonNull Context context, ArrayList<ImgTitleCombo> list) {
+        public ImageAdaptor(@NonNull Context context, ArrayList<ImgTitleCombo> list, ImageViewerFragment _imageViewerFragment) {
             super(context, 0 , list);
+            imageViewerFragment = _imageViewerFragment;
             mContext = context;
             moviesList = list;
         }
 
+        @SuppressLint("ResourceType")
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             View listItem = convertView;
             if(listItem == null)
                 listItem = LayoutInflater.from(mContext).inflate(R.layout.photo_list_item,parent,false);
+            final View finalListItem = listItem;
+            final ImgTitleCombo current = moviesList.get(position);
 
-            ImgTitleCombo current = moviesList.get(position);
-
-
+            Uri imageUri = Uri.parse(current.img);
             ImageView image = (ImageView)listItem.findViewById(R.id.imgPreview);
-            image.setImageURI(Uri.parse(current.img));
+            image.setImageURI(imageUri);
 
-            TextView title = (TextView) listItem.findViewById(R.id.ImgName);
+            final TextView title = (TextView) listItem.findViewById(R.id.ImgName);
             title.setText(current.title);
+            final Context c = this.getContext();
+            listItem.setOnClickListener((view)->{
+                PopupMenu popup = new PopupMenu(this.getContext(), view);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.drawable.photo_menu, popup.getMenu());
+                popup.show();
+                popup.setOnMenuItemClickListener(item -> {
+                    if (item.getItemId() == R.id.view){
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+
+
+                        intent.setDataAndType(imageUri, "image/*");
+                        c.startActivity(intent);
+                    }
+                    if (item.getItemId() == R.id.rename){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(c);
+                        builder.setTitle("Enter image title");
+                        final EditText input = new EditText(c);
+                        input.setInputType(InputType.TYPE_CLASS_TEXT);
+                        input.setText(current.title);
+                        builder.setView(input);
+
+                        builder.setNegativeButton("Cancel",(dialog, which)->{
+                            dialog.cancel();
+                        });
+                        builder.setPositiveButton("Rename", (dialog, which)->{
+                            current.title = input.getText().toString();
+                            title.setText(current.title);
+                            try {
+                                for (int i = 0; i < imageViewerFragment.imgs.length(); i++){
+                                    JSONArray jsonArray = imageViewerFragment.imgs.getJSONArray(i);
+                                    if (!jsonArray.getString(0).equals(current.img)) continue;
+                                    jsonArray.put(1, current.title);
+                                    imageViewerFragment.imgs.put(i, jsonArray);
+                                    break;
+                                }
+
+
+                                imageViewerFragment.saveJson();
+                            } catch (JSONException | IOException ignored) { }
+                        });
+                        builder.show();
+
+                    }
+                    if (item.getItemId() == R.id.delete){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(c);
+                        builder.setTitle("Are you sure you wish to remove this image?");
+                        builder.setNegativeButton("no", ((dialog, which) -> dialog.cancel()));
+                        builder.setPositiveButton("yes", ((dialog, which) -> {
+                            c.getContentResolver().delete(Uri.parse(current.img), null, null);
+                            for (int i = 0; i < imageViewerFragment.imgs.length(); i++){
+                                try {
+                                    JSONArray jsonArray = imageViewerFragment.imgs.getJSONArray(i);
+                                    if (!jsonArray.getString(0).equals(current.img)) continue;
+
+                                    imageViewerFragment.imgs.remove(i);
+                                    this.remove(current);
+                                    imageViewerFragment.saveJson();
+                                    break;
+
+                                } catch (JSONException | IOException ignored) { }
+
+
+                            }
+                        }));
+                        builder.show();
+
+
+
+
+                    }
+                    return true;
+                });
+            });
 
             return listItem;
         }
@@ -84,30 +194,166 @@ public class ImageViewerFragment extends Fragment {
     JSONObject objectToSave;
     JSONArray imgs;
     ImageAdaptor imageAdaptor;
+    public Uri lastPhotoUri;
 
+    public static final int PICK_IMAGE = 1;
+    public static final int TAKE_IMAGE = 2;
+
+    void imageFromGall(View view){
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+    }
+    public static boolean renameImageTitle(ContentResolver contentResolver, Uri imageUri, String newTitle) {
+        // Create ContentValues object with the updated title
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, newTitle);
+
+        // Update the metadata of the image in the content resolver
+        int rowsAffected = contentResolver.update(imageUri, values, null, null);
+        return rowsAffected > 0;
+    }
+    void imageFromCam(View view){
+//        File file = new File(path);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        // Generate a new content URI for the captured image
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Taken from camera at: "+ System.currentTimeMillis());
+        lastPhotoUri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Log.e("WEEWOO", lastPhotoUri.toString());
+        // Continue only if the Insert was successful
+        if (lastPhotoUri != null) {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, lastPhotoUri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            startActivityForResult(intent, TAKE_IMAGE);
+        } else {
+            Toast.makeText(getContext(), "Failed to create a new image URI", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    void saveJson() throws JSONException, IOException {
+        objectToSave.put("imgs", imgs);
+        byte[] bytes = objectToSave.toString().getBytes(StandardCharsets.UTF_8);
+        File file = new File(saveTo);
+        Log.d("SVV", saveTo.toString());
+        if (!file.exists()) file.createNewFile();
+
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+            outputStream.write(bytes);
+            outputStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        Log.d("R1", String.valueOf(requestCode));
+        Log.d("R2", String.valueOf(resultCode));
+        if (requestCode != TAKE_IMAGE && requestCode != PICK_IMAGE) return;
+        Log.d("R", String.valueOf(resultCode));
+        if (resultCode != -1) return;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setTitle("Enter image title");
+
+
+        final EditText input = new EditText(this.getContext());
+
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        final Context c = this.getContext();
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            if (requestCode == PICK_IMAGE){
+
+                ContentValues values = new ContentValues();
+
+                values.put(MediaStore.Images.Media.TITLE, input.getText().toString());
+                values.put(MediaStore.Images.Media.DESCRIPTION, "Taken from gallery at: "+ System.currentTimeMillis());
+                lastPhotoUri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                try(InputStream is = new BufferedInputStream(getContext().getContentResolver().openInputStream(data.getData()))){
+                    try(OutputStream os = new BufferedOutputStream(getContext().getContentResolver().openOutputStream(lastPhotoUri))) {
+                        int byteRead;
+                        while ((byteRead = is.read()) != -1) {
+                            os.write(byteRead);
+                        }
+                        os.flush();
+                    }
+
+
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                JSONArray jsonArray = new JSONArray();
+                jsonArray.put(lastPhotoUri.toString());
+                jsonArray.put(input.getText().toString());
+
+
+                imageAdaptor.add(new ImgTitleCombo(lastPhotoUri.toString(), input.getText().toString()));
+                imgs.put(jsonArray);
+
+
+            }
+            if (requestCode == TAKE_IMAGE){
+                JSONArray jsonArray = new JSONArray();
+
+                jsonArray.put(lastPhotoUri);
+                jsonArray.put(input.getText().toString());
+                imgs.put(jsonArray);
+
+//                renameImageTitle(getContext().getContentResolver(), lastPhotoUri, input.getText().toString());
+
+                imageAdaptor.add(new ImgTitleCombo(lastPhotoUri.toString(), input.getText().toString()));
+            }
+            try {
+                saveJson();
+            } catch (JSONException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        builder.show();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         objectToSave = new JSONObject();
 
-        imageAdaptor = new ImageAdaptor(this.getContext(), new ArrayList<>());
-        imageAdaptor.add(new ImgTitleCombo("https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_272x92dp.png", "WeeWooo"));
+        imageAdaptor = new ImageAdaptor(this.getContext(), new ArrayList<>(), this);
+
+        imgs = new JSONArray();
 
         try {
             if (getArguments() != null) {
                 saveTo = getArguments().getString("saveTo");
+                if (saveTo.startsWith("file:")) saveTo=saveTo.substring("file:".length());
                 if (getArguments().getBoolean("doLoad")){
                     StringBuilder sb = new StringBuilder();
 
-                    try (FileInputStream inputStream = new FileInputStream(saveTo)) {
+                    try (InputStream inputStream = new BufferedInputStream(new FileInputStream(saveTo))) {
 
                         int b;
                         while (-1 != (b = inputStream.read())) {
                             sb.append((char) b);
                         }
+                    }catch (FileNotFoundException e){
+                        e.printStackTrace();
+                        return;
                     }
                     objectToSave = new JSONObject(sb.toString());
                     imgs = objectToSave.getJSONArray("imgs");
+                    for (int i = 0; i < imgs.length(); i++){
+                        JSONArray img = imgs.getJSONArray(i);
+                        imageAdaptor.add(new ImgTitleCombo(img.getString(0), img.getString(1)));
+
+                    }
                 }
     //            mParam2 = getArguments().getString(ARG_PARAM2);
             }else{
@@ -122,9 +368,18 @@ public class ImageViewerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_image_viewer, container, false);
         ((ListView)v.findViewById(R.id.imgList)).setAdapter(imageAdaptor);
+        v.findViewById(R.id.addImgFromCam).setOnClickListener(this::imageFromCam);
+        v.findViewById(R.id.addImgFromGall).setOnClickListener(this::imageFromGall);
+        v.findViewById(R.id.BackImgBtn).setOnClickListener((view)->{
+            CameraManager.instance.handleExit();
+            getActivity().getFragmentManager().popBackStack();
+            }
+        );
+
+
         return v;
     }
+
 }

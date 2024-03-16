@@ -1,28 +1,36 @@
 package com.github.heronerin.secureroute;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.media.Image;
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.Manifest;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentContainerView;
 
 import com.github.heronerin.secureroute.tabs.AddFragment;
 import com.github.heronerin.secureroute.tabs.EventList;
 import com.github.heronerin.secureroute.tabs.SettingsFragment;
 import com.github.heronerin.secureroute.tabs.StatsFragment;
 import com.github.heronerin.secureroute.tabs.UploadFragment;
+import com.github.heronerin.secureroute.tabs.addPages.AddNoteActivity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private final int[] btns = new int[]{R.id.lineItemBtn, R.id.statsBtn, R.id.addBtn, R.id.settingBtn, R.id.uploadBtn};
@@ -37,11 +45,22 @@ public class MainActivity extends AppCompatActivity {
     int currentTab = 0;
 
     void onTabClick(View  v){
+
+        if (v.getId() == R.id.addBtn && R.id.addBtn == currentTab){
+            boolean doReset = ((AddFragment)fragments[2]).onAddClick();
+            if (!doReset)
+                return;
+            v = findViewById(R.id.lineItemBtn);
+
+        }
         if (v.getId() == currentTab)
             return;
         if (currentTab != 0)
             ((ImageButton) findViewById(currentTab)).clearColorFilter();
-        ((ImageButton) v).setColorFilter(Color.CYAN);
+        if (v.getId() != R.id.addBtn)
+            ((ImageButton) v).setColorFilter(Color.CYAN);
+        else
+            ((ImageButton) v).setColorFilter(Color.rgb(0xFF, 0xA5, 0));
         currentTab = v.getId();
 
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -53,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
         }
+
         fragmentTransaction.commit();
     }
 
@@ -68,15 +88,41 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        String[] perms =  new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+        List<String> needs = new ArrayList<>();
+        boolean needsPerm = false;
+        for (String perm : perms){
+            boolean denied = PackageManager.PERMISSION_DENIED == ContextCompat.checkSelfPermission(this, perm);
+            if (denied) needs.add(perm);
+            needsPerm |= denied;
+        }
+        if (needsPerm){
+            ActivityCompat.requestPermissions((Activity) this, needs.toArray(new String[0]), 69);
+        }
 
         for (int btn : btns)
             findViewById(btn).setOnClickListener(this::onTabClick);
+        findViewById(btns[0]).callOnClick();
 
-        findViewById(R.id.lineItemBtn).callOnClick();
+        CameraManager.instance = new CameraManager(this);
 
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
 
-//        ((FragmentContainerView) findViewById(R.id.tabFragmentContainer)).getFra
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != 69) return;
+        Log.d("RES", Arrays.toString(grantResults));
+        Log.d("RES", Arrays.toString(permissions));
+        for (int perResult : grantResults){
+            if (perResult == PackageManager.PERMISSION_DENIED){
+                Toast.makeText(this, "These permissions are not optional!", Toast.LENGTH_LONG).show();
+                this.finish();
+            }
+        }
+
     }
 
 }

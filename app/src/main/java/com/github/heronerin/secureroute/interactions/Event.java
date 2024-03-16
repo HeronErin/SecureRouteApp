@@ -4,6 +4,7 @@ import static com.github.heronerin.secureroute.interactions.Event.EventVariety.*
 
 import androidx.annotation.Nullable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 public class Event {
     public enum EventVariety{
         Empty,
+        ArbitraryNote,
         ArbitraryRangeStart,
         ArbitraryRangeEnd,
         MillageStartJob,
@@ -29,8 +31,8 @@ public class Event {
     public long timeStamp;
     public double expenseValue;
     @Nullable public String noteData;
-    @Nullable public String imageUri;
-    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _expenseValue, @Nullable String _noteData, @Nullable String _imageUri){
+    @Nullable public JSONArray imageUri;
+    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _expenseValue, @Nullable String _noteData, @Nullable JSONArray _imageUri){
         this.variety = _variety;
         this.eventId = _eventId;
         this.timeStamp = _timeStamp;
@@ -58,7 +60,7 @@ public class Event {
                 jsonObject.getLong("time"),
                 jsonObject.getDouble("$"),
                 jsonObject.getString("n"),
-                jsonObject.getString("i")
+                jsonObject.getJSONArray("i")
         );
     }
 
