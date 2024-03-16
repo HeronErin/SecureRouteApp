@@ -1,12 +1,19 @@
 package com.github.heronerin.secureroute;
 
-import static androidx.fragment.app.FragmentManagerKt.commit;
-
-import android.content.Context;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentContainerView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class CameraManager {
     public static CameraManager instance = null;
@@ -35,7 +42,23 @@ public class CameraManager {
             if (onExit != null) onExit.run();
             onExit = null;
         });
+    }
+    public JSONArray getTempJsonArray(){
+        StringBuilder sb = new StringBuilder();
 
+        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(CameraManager.instance.getTempPath()))) {
+
+            int b;
+            while (-1 != (b = inputStream.read())) {
+                sb.append((char) b);
+            }
+
+            return (new JSONObject(sb.toString())).getJSONArray("imgs");
+        }catch (FileNotFoundException ignored){
+            return new JSONArray();
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

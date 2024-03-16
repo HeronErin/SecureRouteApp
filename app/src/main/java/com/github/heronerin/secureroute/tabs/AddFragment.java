@@ -1,6 +1,5 @@
 package com.github.heronerin.secureroute.tabs;
 
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,10 +16,8 @@ import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.interactions.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AbstractAddPage;
-import com.github.heronerin.secureroute.tabs.addPages.AddNoteActivity;
+import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 import com.github.heronerin.secureroute.tabs.addPages.GasFillUpFragment;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +29,7 @@ public class AddFragment extends Fragment {
     private List<AbstractAddPage> addPages = getPages();
     private static List<AbstractAddPage> getPages(){
         return new ArrayList<>(Arrays.asList(
-                AddNoteActivity.newInstance(),
+                AddNoteFragment.newInstance(),
                 GasFillUpFragment.newInstance(),
                 null
         ));

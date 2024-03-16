@@ -1,43 +1,34 @@
 package com.github.heronerin.secureroute.tabs.addPages;
+/**
+ * Just a simple way to add a note to your timeline...
+ * Use this as a template for future addPage items...
+ */
+
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.CameraManager;
-import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.interactions.Event;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 @SuppressLint("MissingInflatedId")
-public class AddNoteActivity extends AbstractAddPage {
+public class AddNoteFragment extends AbstractAddPage {
     @Override
     public boolean isValid() {
         return usingImages || !((EditText) getActivity().findViewById(R.id.noteField)).getText().toString().trim().isEmpty();
@@ -64,23 +55,8 @@ public class AddNoteActivity extends AbstractAddPage {
     public Event genValidEvent() {
         JSONArray jsonArray = new JSONArray();
         if (usingImages){
-            StringBuilder sb = new StringBuilder();
-
-            try (InputStream inputStream = new BufferedInputStream(new FileInputStream(CameraManager.instance.getTempPath()))) {
-
-                int b;
-                while (-1 != (b = inputStream.read())) {
-                    sb.append((char) b);
-                }
-
-                jsonArray = (new JSONObject(sb.toString())).getJSONArray("imgs");
-            }catch (FileNotFoundException e){
-                Log.w(this.getTag(), e);
-            } catch (IOException | JSONException e) {
-                throw new RuntimeException(e);
-            }
+            jsonArray = CameraManager.instance.getTempJsonArray();
         }
-
 
         return new Event(
                 Event.EventVariety.ArbitraryNote,
@@ -92,14 +68,11 @@ public class AddNoteActivity extends AbstractAddPage {
         );
     }
 
-
-
-
-    public AddNoteActivity() {
+    public AddNoteFragment() {
         // Required empty public constructor
     }
-    public static AddNoteActivity newInstance() {
-        AddNoteActivity fragment = new AddNoteActivity();
+    public static AddNoteFragment newInstance() {
+        AddNoteFragment fragment = new AddNoteFragment();
         return fragment;
     }
 

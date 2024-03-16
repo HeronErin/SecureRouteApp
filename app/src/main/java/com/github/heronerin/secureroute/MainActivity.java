@@ -26,7 +26,6 @@ import com.github.heronerin.secureroute.tabs.EventList;
 import com.github.heronerin.secureroute.tabs.SettingsFragment;
 import com.github.heronerin.secureroute.tabs.StatsFragment;
 import com.github.heronerin.secureroute.tabs.UploadFragment;
-import com.github.heronerin.secureroute.tabs.addPages.AddNoteActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
