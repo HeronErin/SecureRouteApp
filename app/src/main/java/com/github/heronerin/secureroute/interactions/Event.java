@@ -46,6 +46,7 @@ public class Event {
 
     };
     public boolean[] rangeCache = new boolean[]{false, false, false, false, false};
+    public List<Event> cachedRanges = new ArrayList<>();
     public enum EventVariety{
         Empty,
         ArbitraryNote,
@@ -85,11 +86,12 @@ public class Event {
         int rangeIndex = 0;
 
         List<Pair<Integer, Integer>> rangeOpensAndColors = new ArrayList<>();
-        List<Integer> colorsInUse = new ArrayList<>();
+        List<Pair<Integer, Event>> colorsInUse = new ArrayList<>();
 
         while (eventIndex < events.size()){
             Log.w("EventSort", String.valueOf(events.get(0).timeStamp));
             Event e = events.get(eventIndex);
+            e.cachedRanges.clear();
 
             while (rangeIndex < ranges.size() && ranges.get(rangeIndex).timeStamp <= events.get(eventIndex).timeStamp){
                 Event range = ranges.get(rangeIndex);
@@ -99,7 +101,7 @@ public class Event {
                     for (int c = pastColorStart; c < 5+pastColorStart; c++){
                         if (!colorsInUse.contains(c % 5)){
                             foundColor = c % 5;
-                            colorsInUse.add(c % 5);
+                            colorsInUse.add(new Pair<>(c % 5, range));
                             break;
                         }
                     }
@@ -118,8 +120,9 @@ public class Event {
                 rangeIndex++;
             }
             Log.e("Color", colorsInUse.toString());
-            for (Integer i : colorsInUse){
-                e.rangeCache[i] = true;
+            for (Pair<Integer, Event> i : colorsInUse){
+                e.rangeCache[i.first] = true;
+                e.cachedRanges.add(i.second);
             }
             eventIndex++;
 

@@ -37,7 +37,7 @@ public class EventList extends Fragment {
         DataBase db = DataBase.getOrCreate(this.getContext());
 
         List<Event> eventList = db.getEventsByTime(100, true);
-        List<Event> rangeList = db.getRange(100, true);
+        List<Event> rangeList = db.getRange(Integer.MAX_VALUE, true);
 
         Event.applyRanges(eventList, rangeList);
 
