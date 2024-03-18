@@ -5,11 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.github.heronerin.secureroute.interactions.Event;
+import com.github.heronerin.secureroute.events.Event;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,8 +92,8 @@ public class DataBase extends SQLiteOpenHelper {
             if (event.noteData != null)
                 values.put("note_data", event.noteData);
 
-            if (event.imageUri != null)
-                values.put("image_uri", event.imageUri.toString());
+            if (event.getImageData() != null)
+                values.put("image_uri", event.getImageData().toString());
 
             long id = db.insert("events", null, values);
             customEventSaveHandler(event, id, db);

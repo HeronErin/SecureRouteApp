@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
-import com.github.heronerin.secureroute.interactions.Event;
+import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AbstractAddPage;
 import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 import com.github.heronerin.secureroute.tabs.addPages.GasFillUpFragment;
@@ -153,6 +153,7 @@ public class AddFragment extends Fragment {
                 Toast.makeText(this.getContext(), "Error getting event from page, can't add to DB", Toast.LENGTH_LONG).show();
                 return false;
             }
+            Log.d(getTag(), event.getImageData().toString());
             DataBase.getOrCreate(this.getContext()).addEvent(event);
             Toast.makeText(this.getContext(), "Added page to DB", Toast.LENGTH_LONG).show();
             currentPage.clearStorage();

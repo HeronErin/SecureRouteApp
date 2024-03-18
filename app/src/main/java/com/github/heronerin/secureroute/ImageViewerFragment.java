@@ -60,9 +60,9 @@ public class ImageViewerFragment extends Fragment {
         return Uri.parse(uriString.replaceFirst(oldScheme + ":", newScheme + ":"));
     }
 
-    static class ImgTitleCombo{
-        String img;
-        String title;
+    public static class ImgTitleCombo{
+        public String img;
+        public String title;
 
         public ImgTitleCombo(String url, String title) {
             this.img=url;
@@ -72,14 +72,14 @@ public class ImageViewerFragment extends Fragment {
     static class ImageAdaptor extends ArrayAdapter<ImgTitleCombo> {
 
         private Context mContext;
-        private List<ImgTitleCombo> moviesList = new ArrayList<>();
+        private List<ImgTitleCombo> imageComboList = new ArrayList<>();
         ImageViewerFragment imageViewerFragment;
 
-        public ImageAdaptor(@NonNull Context context, ArrayList<ImgTitleCombo> list, ImageViewerFragment _imageViewerFragment) {
+        public ImageAdaptor(@NonNull Context context, List<ImgTitleCombo> list, ImageViewerFragment _imageViewerFragment) {
             super(context, 0 , list);
             imageViewerFragment = _imageViewerFragment;
             mContext = context;
-            moviesList = list;
+            imageComboList = list;
         }
 
         @SuppressLint("ResourceType")
@@ -89,8 +89,7 @@ public class ImageViewerFragment extends Fragment {
             View listItem = convertView;
             if(listItem == null)
                 listItem = LayoutInflater.from(mContext).inflate(R.layout.photo_list_item,parent,false);
-            final View finalListItem = listItem;
-            final ImgTitleCombo current = moviesList.get(position);
+            final ImgTitleCombo current = imageComboList.get(position);
 
             Uri imageUri = Uri.parse(current.img);
             ImageView image = (ImageView)listItem.findViewById(R.id.imgPreview);

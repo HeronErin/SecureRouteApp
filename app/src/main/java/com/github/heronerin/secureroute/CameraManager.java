@@ -1,5 +1,6 @@
 package com.github.heronerin.secureroute;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -46,15 +47,20 @@ public class CameraManager {
     public JSONArray getTempJsonArray(){
         StringBuilder sb = new StringBuilder();
 
-        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(CameraManager.instance.getTempPath()))) {
+        String path = CameraManager.instance.getTempPath();
+
+        if (path.startsWith("file:/")) path=path.substring("file:/".length());
+
+        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(path))) {
 
             int b;
             while (-1 != (b = inputStream.read())) {
                 sb.append((char) b);
             }
-
-            return (new JSONObject(sb.toString())).getJSONArray("imgs");
-        }catch (FileNotFoundException ignored){
+            JSONObject parcedObj = new JSONObject(sb.toString());
+            return parcedObj.getJSONArray("imgs");
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
             return new JSONArray();
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);

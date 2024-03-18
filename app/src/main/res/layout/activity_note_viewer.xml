@@ -7,4 +7,57 @@
     android:layout_height="match_parent"
     tools:context=".eventViewer.NoteViewer">
 
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/eventVirietyPreview"
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:layout_marginTop="25dp"
+                app:srcCompat="@drawable/note_icon" />
+
+            <TextView
+                android:id="@+id/noteData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="50dp"
+                android:text="Images:" />
+
+            <ListView
+                android:id="@+id/imageDisplayHolder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <TextView
+                android:id="@+id/memberOf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="50dp"
+                android:text="Ranges:" />
+
+            <ListView
+                android:id="@+id/ranges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

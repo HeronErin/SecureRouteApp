@@ -2,16 +2,12 @@ package com.github.heronerin.secureroute.tabs.addPages;
 
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.heronerin.secureroute.R;
-import com.github.heronerin.secureroute.interactions.Event;
-
-import org.json.JSONObject;
+import com.github.heronerin.secureroute.events.Event;
 
 
 public class GasFillUpFragment extends AbstractAddPage {

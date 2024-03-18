@@ -1,11 +1,9 @@
-package com.github.heronerin.secureroute.tabs;
-
-import static android.view.View.GONE;
+package com.github.heronerin.secureroute.events;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,18 +14,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
-import com.github.heronerin.secureroute.interactions.Event;
+import com.github.heronerin.secureroute.eventViewer.NoteViewer;
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class EventArrayAdapter extends ArrayAdapter<Event> {
-    public static final int MAX_PREVIEW_SIZE = 128;
+
 
     private Context mContext;
     private List<Event> eventList = new ArrayList<>();
@@ -43,21 +40,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         super.notifyDataSetChanged();
 
     }
-    public static String noteDataHandle(@Nullable String input){
-        if (input == null) input = "";
-        input=input.trim();
 
-        String data = "Empty note";
-        if (!input.isEmpty()){
-            data = input;
-            int nextLine = data.indexOf("\n");
-            if (nextLine != -1 || data.length() > MAX_PREVIEW_SIZE){
-                if (nextLine != -1) data = data.substring(0, nextLine) + "...";
-                if (data.length() > MAX_PREVIEW_SIZE) data = data.substring(0, MAX_PREVIEW_SIZE) + "...";
-            }
-        }
-        return data;
-    }
     private static int[] bars = new int[]{R.id.redBar, R.id.blueBar, R.id.purpleBar, R.id.orangeBar, R.id.greenBar};
     @SuppressLint("ResourceType")
     @NonNull
@@ -67,7 +50,9 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         View listItem = convertView;
         if(listItem == null)
             listItem = LayoutInflater.from(mContext).inflate(R.layout.event_list_item,parent,false);
-        Event event = eventList.get(position);
+
+
+        final Event event = eventList.get(position);
 
 
 
@@ -85,14 +70,15 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         dateTimeText.setText(formatter.format(date));
 
         TextView textPreview = listItem.findViewById(R.id.textPreview);
-        if (event.variety == Event.EventVariety.ArbitraryNote){
-            textPreview.setText(noteDataHandle(event.noteData));
-            imageView.setImageResource(R.drawable.note_icon);
-        }
-        if (event.variety == Event.EventVariety.ArbitraryRangeStart){
-            textPreview.setText(noteDataHandle(event.noteData));
-            imageView.setImageResource(R.drawable.calender_icon);
-        }
+
+        textPreview.setText(event.eventPreview());
+        imageView.setImageResource(event.getIcon());
+
+        listItem.setOnClickListener(v -> {
+            Intent intent = new Intent(EventArrayAdapter.this.mContext, event.getViewerClass());
+            intent.putExtra("event", event.encodeAsString());
+            EventArrayAdapter.this.mContext.startActivity(intent);
+        });
 
 
         return listItem;

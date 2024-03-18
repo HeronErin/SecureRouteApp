@@ -7,7 +7,6 @@ import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +17,8 @@ import android.widget.Spinner;
 import com.github.heronerin.secureroute.CameraManager;
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
-import com.github.heronerin.secureroute.interactions.Event;
-import com.github.heronerin.secureroute.tabs.EventArrayAdapter;
+import com.github.heronerin.secureroute.events.Event;
+import com.github.heronerin.secureroute.events.EventArrayAdapter;
 
 import org.json.JSONArray;
 
@@ -157,7 +156,7 @@ public class RangeEventAddFragment extends AbstractAddPage {
             List<String> displayNames = new ArrayList<>();
             displayNames.add("Select A Range to end");
             for (Event event : unendedEvents)
-                displayNames.add(EventArrayAdapter.noteDataHandle(event.noteData));
+                displayNames.add(event.eventPreview());
 
             Spinner endOfSpinner = EndOfRange.findViewById(R.id.endOfSpinner);
             endOfSpinner.setAdapter(new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_dropdown_item, displayNames));

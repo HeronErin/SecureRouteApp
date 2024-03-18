@@ -1,24 +1,58 @@
-package com.github.heronerin.secureroute.interactions;
+package com.github.heronerin.secureroute.events;
 
-import static com.github.heronerin.secureroute.interactions.Event.EventVariety.*;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.*;
 
 import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.Nullable;
 
+import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.eventViewer.NoteViewer;
+
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public class Event {
+
+
+
+public class Event implements Serializable {
+    private static class JsonArrayHolder implements Serializable {
+        private transient JSONArray jsonArray;
+
+        public JsonArrayHolder(JSONArray _jsonArray) {
+            jsonArray = _jsonArray;
+        }
+
+        private void writeObject(ObjectOutputStream oos) throws IOException {
+            oos.defaultWriteObject();
+            oos.writeObject(jsonArray.toString());
+        }
+
+        private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+            ois.defaultReadObject();
+
+            String jsonArrayString = (String) ois.readObject();
+            try {
+                jsonArray = new JSONArray(jsonArrayString);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public static boolean isRangeStart(EventVariety v){
         return  v == ArbitraryRangeStart || v == MillageStartJob || v == MillageStartNonJob;
     }
@@ -66,15 +100,23 @@ public class Event {
     @Nullable public int associatedPair = -1;
     public double expenseValue;
     @Nullable public String noteData;
-    @Nullable public JSONArray imageUri;
-    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _expenseValue, int _associatedPair, @Nullable String _noteData, @Nullable JSONArray _imageUri){
+    @Nullable private JsonArrayHolder imageData;
+
+    @Nullable
+    public JSONArray getImageData() {
+        if (imageData == null) return null;
+        return imageData.jsonArray;
+    }
+
+    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _expenseValue, int _associatedPair, @Nullable String _noteData, @Nullable JSONArray _imagedata){
         this.variety = _variety;
         this.eventId = _eventId;
         this.timeStamp = _timeStamp;
         this.expenseValue = _expenseValue;
         this.associatedPair=_associatedPair;
         this.noteData = _noteData;
-        this.imageUri = _imageUri;
+        this.imageData = _imagedata == null ? null :new JsonArrayHolder(_imagedata);
+//        this.imageUri = _imageUri;
     }
 
 
@@ -130,4 +172,73 @@ public class Event {
         }
         Collections.reverse(events);
     }
+
+    public static final int MAX_PREVIEW_SIZE = 128;
+    private static String noteDataHandle(@Nullable String input){
+        if (input == null) input = "";
+        input=input.trim();
+
+        String data = "Empty note";
+        if (!input.isEmpty()){
+            data = input;
+            int nextLine = data.indexOf("\n");
+            if (nextLine != -1 || data.length() > MAX_PREVIEW_SIZE){
+                if (nextLine != -1) data = data.substring(0, nextLine) + "...";
+                if (data.length() > MAX_PREVIEW_SIZE) data = data.substring(0, MAX_PREVIEW_SIZE) + "...";
+            }
+        }
+        return data;
+    }
+    public String eventPreview(){
+        if (variety == Empty)
+            return "EMPTY EVENT";
+        if (variety == ArbitraryNote || variety == ArbitraryRangeStart)
+            return noteDataHandle(noteData);
+        if (isRangeEnd(variety))
+            return "End of " + getAsRangeStart(variety).toString();
+        return "TODO: Handle this event (" + variety.toString() + ")";
+    }
+    public int getIcon(){
+        if (variety == ArbitraryNote){
+            return R.drawable.note_icon;
+        }
+        if (variety == ArbitraryRangeStart)
+            return R.drawable.calender_icon;
+        if (variety == MillageStartJob || variety == MillageEndJob)
+            return R.drawable.pump_icon;
+
+        return R.drawable.ic_launcher_foreground;
+    }
+
+    public String encodeAsString(){
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+            oos.close();
+            return Base64.encodeBase64String(baos.toByteArray());
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+    public static Event decodeFromString(String base64String){
+        try {
+            byte[] bytes = Base64.decodeBase64(base64String);
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            ObjectInputStream ois = new ObjectInputStream(bais);
+
+            Event instance = (Event) ois.readObject();
+
+            ois.close();
+            return instance;
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public  Class<?> getViewerClass(){
+
+        return NoteViewer.class;
+    }
+
+
 }

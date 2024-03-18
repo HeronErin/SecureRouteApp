@@ -20,7 +20,7 @@ import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.CameraManager;
 import com.github.heronerin.secureroute.R;
-import com.github.heronerin.secureroute.interactions.Event;
+import com.github.heronerin.secureroute.events.Event;
 
 import org.json.JSONArray;
 
@@ -44,8 +44,6 @@ public class AddNoteFragment extends AbstractAddPage {
             if (path.startsWith("file:/")) path=path.substring("file:/".length());
 
             File f = new File(path);
-            Log.d(getTag(), "Removing" + path);
-            Log.d(getTag(), "Exists:" + f.exists());
             if (f.exists()) f.delete();
             usingImages = false;
         }
@@ -105,9 +103,10 @@ public class AddNoteFragment extends AbstractAddPage {
             e.apply();
         });
         assert CameraManager.instance != null;
-        v.findViewById(R.id.addImg).setOnClickListener((view)->
-            CameraManager.instance.openTemp(()->usingImages=true)
-        );
+        v.findViewById(R.id.addImg).setOnClickListener((view)-> {
+            usingImages=true;
+            CameraManager.instance.openTemp(() -> usingImages = true);
+        });
 
 
 
