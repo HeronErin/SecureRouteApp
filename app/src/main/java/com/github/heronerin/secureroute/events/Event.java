@@ -202,6 +202,10 @@ public class Event implements Serializable {
             return noteDataHandle(noteData);
         if (isRangeEnd(variety))
             return "End of " + getAsRangeStart(variety).toString();
+        if (variety == Income)
+            return "+$"+String.valueOf(moneyAmount)+"\n"+noteDataHandle(noteData);
+        if (variety == JobExpense || variety == Expense)
+            return "-$"+String.valueOf(moneyAmount)+"\n"+noteDataHandle(noteData);
         return "TODO: Handle this event (" + variety.toString() + ")";
     }
     public int getIcon(){
@@ -212,6 +216,12 @@ public class Event implements Serializable {
             return R.drawable.calender_icon;
         if (variety == MillageStartJob || variety == MillageEndJob)
             return R.drawable.pump_icon;
+        if (variety == Income)
+            return R.drawable.green_dollar_icon;
+        if (variety == JobExpense)
+            return R.drawable.red_dollar_icon;
+        if (variety == Expense)
+            return R.drawable.yellow_dollar_icon;
 
         return R.drawable.ic_launcher_foreground;
     }

@@ -1,10 +1,17 @@
 package com.github.heronerin.secureroute.tabs.addPages;
 
+import android.view.View;
+import android.widget.EditText;
+
 import androidx.fragment.app.Fragment;
 
+import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 
 public abstract class AbstractAddPage extends Fragment {
+    public static boolean isEmptyTextView(EditText view){
+        return view.getText().toString().trim().isEmpty();
+    }
     public abstract boolean isValid();
     public abstract Event genValidEvent();
 

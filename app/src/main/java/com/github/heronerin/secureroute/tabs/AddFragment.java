@@ -17,6 +17,7 @@ import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AbstractAddPage;
+import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
 import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 import com.github.heronerin.secureroute.tabs.addPages.GasFillUpFragment;
 import com.github.heronerin.secureroute.tabs.addPages.RangeEventAddFragment;
@@ -35,18 +36,11 @@ public class AddFragment extends Fragment {
     private static List<AbstractAddPage> getPages(){
         return new ArrayList<>(Arrays.asList(
                 AddNoteFragment.newInstance(),
+                AddIncomeFragment.newInstance(),
                 GasFillUpFragment.newInstance(),
                 RangeEventAddFragment.newInstance()
         ));
     }
-//    private String[] addTypes = new String[]{
-//            "Addition type",
-//            "Gas fill up",
-//            "Millage tracking",
-//            "Income",
-//            "Expense",
-//            "Range"
-//    };
 
     int currentCategory = 0;
 
