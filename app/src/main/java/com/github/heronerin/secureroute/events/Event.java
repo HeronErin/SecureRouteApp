@@ -90,15 +90,21 @@ public class Event implements Serializable {
         MillageEndJob,
         MillageStartNonJob,
         MillageEndNonJob,
-        ArbitraryJobExpense,
-        ArbitraryExpense
+        JobExpense,
+        Expense,
+
+        Income
+
+
+
+
     }
     public EventVariety variety = Empty;
     public int databaseId = -1;
     public UUID eventId;
     public long timeStamp;
     @Nullable public int associatedPair = -1;
-    public double expenseValue;
+    public double moneyAmount;
     @Nullable public String noteData;
     @Nullable private JsonArrayHolder imageData;
 
@@ -108,11 +114,11 @@ public class Event implements Serializable {
         return imageData.jsonArray;
     }
 
-    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _expenseValue, int _associatedPair, @Nullable String _noteData, @Nullable JSONArray _imagedata){
+    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _moneyAmount, int _associatedPair, @Nullable String _noteData, @Nullable JSONArray _imagedata){
         this.variety = _variety;
         this.eventId = _eventId;
         this.timeStamp = _timeStamp;
-        this.expenseValue = _expenseValue;
+        this.moneyAmount = _moneyAmount;
         this.associatedPair=_associatedPair;
         this.noteData = _noteData;
         this.imageData = _imagedata == null ? null :new JsonArrayHolder(_imagedata);

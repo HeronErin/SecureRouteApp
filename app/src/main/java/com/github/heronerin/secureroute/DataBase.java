@@ -87,7 +87,7 @@ public class DataBase extends SQLiteOpenHelper {
             values.put("event_id", event.eventId.toString());
             values.put("timestamp", event.timeStamp);
             values.put("associated_pair", event.associatedPair);
-            values.put("expense_value", event.expenseValue);
+            values.put("expense_value", event.moneyAmount);
 
             if (event.noteData != null)
                 values.put("note_data", event.noteData);
