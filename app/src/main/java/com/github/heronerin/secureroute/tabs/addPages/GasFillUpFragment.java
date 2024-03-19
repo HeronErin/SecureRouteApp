@@ -50,4 +50,14 @@ public class GasFillUpFragment extends AbstractAddPage {
     @Override
     public void setMode(int index) { }
 
+    @Override
+    public String getDisplay() {
+        return "Gas FillUp";
+    }
+
+    @Override
+    public String[] getSubTypes() {
+        return null;
+    }
+
 }

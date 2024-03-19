@@ -53,6 +53,16 @@ public class AddNoteFragment extends AbstractAddPage {
     public void setMode(int index) { }
 
     @Override
+    public String getDisplay() {
+        return "Add note";
+    }
+
+    @Override
+    public String[] getSubTypes() {
+        return null;
+    }
+
+    @Override
     public Event genValidEvent() {
         JSONArray jsonArray = new JSONArray();
         if (usingImages){

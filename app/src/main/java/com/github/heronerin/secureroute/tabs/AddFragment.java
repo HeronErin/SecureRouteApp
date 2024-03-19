@@ -23,29 +23,31 @@ import com.github.heronerin.secureroute.tabs.addPages.RangeEventAddFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AddFragment extends Fragment {
-    private String[] pleaseSelect = new String[]{"No category selected"};
-    private String[] rangeSubCategories = new String[]{"Start", "End"};
+//    private String[] pleaseSelect = new String[]{"No category selected"};
+//    private String[] rangeSubCategories = new String[]{"Start", "End"};
 
     private List<AbstractAddPage> addPages = getPages();
     private static List<AbstractAddPage> getPages(){
         return new ArrayList<>(Arrays.asList(
                 AddNoteFragment.newInstance(),
                 GasFillUpFragment.newInstance(),
-                null,
-                null,
                 RangeEventAddFragment.newInstance()
         ));
     }
-    private String[] addTypes = new String[]{
-            "Addition type",
-            "Gas fill up",
-            "Millage tracking",
-            "Expense",
-            "Range"
-    };
+//    private String[] addTypes = new String[]{
+//            "Addition type",
+//            "Gas fill up",
+//            "Millage tracking",
+//            "Income",
+//            "Expense",
+//            "Range"
+//    };
+
     int currentCategory = 0;
 
     AbstractAddPage currentPage = null;
@@ -53,20 +55,22 @@ public class AddFragment extends Fragment {
     public void updateSubCategory(){
 
         Spinner s = baseView.findViewById(R.id.addSubType);
-        String[] arr = pleaseSelect;
+//        String[] arr = pleaseSelect;
         s.setVisibility(View.VISIBLE);
 
+        currentPage = addPages.get(currentCategory);
 
-        if (currentCategory == 1 || currentCategory == 0)
+        String[] sub = currentPage.getSubTypes();
+        if (sub == null)
             s.setVisibility(View.GONE);
 
-        if (currentCategory == 4)
-            arr = rangeSubCategories;
+//        if (currentCategory == 4)
+//            arr = rangeSubCategories;
 
-        subCategoryAdaptor = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, arr);
+        subCategoryAdaptor = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, sub != null ? sub : new String[0] );
         s.setAdapter(subCategoryAdaptor);
 
-        currentPage = addPages.get(currentCategory);
+
         if (currentPage != null) {
             if (currentPage.getView() == null) addPages = getPages();
 
@@ -118,6 +122,11 @@ public class AddFragment extends Fragment {
 
         Spinner s = baseView.findViewById(R.id.addType);
         s.setOnItemSelectedListener(MainCategoryChange);
+
+        String[] addTypes = new String[addPages.size()];
+        for (int i = 0; i < addPages.size(); i++)
+            addTypes[i] = addPages.get(i).getDisplay();
+
 
         mainCategoryAdaptor = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, addTypes);
         s.setAdapter(mainCategoryAdaptor);

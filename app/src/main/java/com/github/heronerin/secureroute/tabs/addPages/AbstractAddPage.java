@@ -11,4 +11,7 @@ public abstract class AbstractAddPage extends Fragment {
     public abstract void clearStorage();
 
     public abstract void setMode(int index);
+
+    public abstract String getDisplay();
+    public abstract String[] getSubTypes();
 }

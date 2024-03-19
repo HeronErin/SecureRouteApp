@@ -162,4 +162,14 @@ public class RangeEventAddFragment extends AbstractAddPage {
             endOfSpinner.setAdapter(new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_dropdown_item, displayNames));
         }
     }
+
+    @Override
+    public String getDisplay() {
+        return "Range";
+    }
+
+    @Override
+    public String[] getSubTypes() {
+        return new String[]{"Start", "End"};
+    }
 }
