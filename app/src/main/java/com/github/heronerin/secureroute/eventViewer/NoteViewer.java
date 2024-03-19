@@ -8,8 +8,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -18,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -27,7 +30,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.widget.NestedScrollView;
 
+import com.bumptech.glide.Glide;
 import com.github.heronerin.secureroute.ImageViewerFragment;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
@@ -63,7 +68,11 @@ public class NoteViewer extends AppCompatActivity {
 
             final Uri imageUri = Uri.parse(combo.img);
             ImageView image = (ImageView)listItem.findViewById(R.id.imgPreview);
-            image.setImageURI(imageUri);
+
+            Glide.with(mContext)
+                    .load(imageUri)
+                    .override(256, 256) // Set the desired preview size
+                    .into(image);
 
             final TextView title = (TextView) listItem.findViewById(R.id.ImgName);
             title.setText(combo.title);
@@ -95,6 +104,7 @@ public class NoteViewer extends AppCompatActivity {
 
             view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
             totalHeight += view.getMeasuredHeight();
+
         }
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
@@ -105,13 +115,8 @@ public class NoteViewer extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_note_viewer);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
 
         Bundle extras = getIntent().getExtras();
         assert extras != null;
@@ -141,9 +146,8 @@ public class NoteViewer extends AppCompatActivity {
         EventArrayAdapter eventArrayAdapter = new EventArrayAdapter(this, event.cachedRanges);
         ((ListView)findViewById(R.id.ranges)).setAdapter(eventArrayAdapter);
 
-
-        setListViewHeightBasedOnChildren(((ListView)findViewById(R.id.ranges)));
         setListViewHeightBasedOnChildren(((ListView)findViewById(R.id.imageDisplayHolder)));
+
 
     }
 }

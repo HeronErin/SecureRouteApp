@@ -28,6 +28,8 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,7 +95,11 @@ public class ImageViewerFragment extends Fragment {
 
             Uri imageUri = Uri.parse(current.img);
             ImageView image = (ImageView)listItem.findViewById(R.id.imgPreview);
-            image.setImageURI(imageUri);
+
+            Glide.with(mContext)
+                    .load(imageUri)
+                    .override(256, 256) // Set the desired preview size
+                    .into(image);
 
             final TextView title = (TextView) listItem.findViewById(R.id.ImgName);
             title.setText(current.title);

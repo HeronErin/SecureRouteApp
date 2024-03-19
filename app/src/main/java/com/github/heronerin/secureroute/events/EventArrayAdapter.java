@@ -46,7 +46,6 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Log.w("this.getContext", String.valueOf(position));
         View listItem = convertView;
         if(listItem == null)
             listItem = LayoutInflater.from(mContext).inflate(R.layout.event_list_item,parent,false);
