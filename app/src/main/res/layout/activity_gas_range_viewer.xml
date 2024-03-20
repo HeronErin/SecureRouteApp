@@ -35,13 +35,14 @@
                 android:text="Amount spent"
                 android:textAlignment="center"
                 android:textSize="20sp" />
+
             <TextView
                 android:id="@+id/tripInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Info about trip"
-                android:textAlignment="center"
-                android:textSize="20sp" />
+                android:textAlignment="viewStart"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/noteData"
@@ -65,7 +66,7 @@
                 android:id="@+id/rangesTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ranges:" />
+                android:text="Contains:" />
 
             <ListView
                 android:id="@+id/ranges"

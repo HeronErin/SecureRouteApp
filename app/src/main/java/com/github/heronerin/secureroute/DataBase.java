@@ -100,6 +100,13 @@ public class DataBase extends SQLiteOpenHelper {
             return null;
         return events.get(0);
     }
+    public List<Event> getInTimeFrame(long start, long end){
+        return eventsBySql(
+                "SELECT * FROM events WHERE (timestamp > ? AND timestamp < ?) ORDER BY timestamp DESC",
+                new String[]{String.valueOf(start), String.valueOf(end)},
+                Integer.MAX_VALUE
+        );
+    }
 
     private static String StringPlaceHolderGen(int amount){
         StringBuilder stringBuilder = new StringBuilder();

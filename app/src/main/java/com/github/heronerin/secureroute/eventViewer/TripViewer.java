@@ -58,8 +58,8 @@ public class TripViewer extends AppCompatActivity {
         String tripStats = "Miles driven: " + String.valueOf(endOfTrip.odometer - startOfTrip.odometer);
         tripStats+="\nTime taken: " + formatMillisecondsToTime(endOfTrip.timeStamp - startOfTrip.timeStamp);
         tripStats+="\n";
-        tripStats+="\nS: " + startOfTrip.odometer;
-        tripStats+="\nE: " + endOfTrip.odometer;
+        tripStats+="\nStarting odometer: " + startOfTrip.odometer;
+        tripStats+="\nEnding odometer: " + endOfTrip.odometer;
 
         tripInfo.setText(tripStats);
     }

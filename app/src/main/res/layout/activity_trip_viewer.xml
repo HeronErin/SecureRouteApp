@@ -34,8 +34,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Info about trip"
-                android:textAlignment="center"
-                android:textSize="20sp" />
+                android:textAlignment="viewStart"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/noteData"

@@ -7,7 +7,9 @@ import android.util.Pair;
 
 import androidx.annotation.Nullable;
 
+import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.TripUtils;
 import com.github.heronerin.secureroute.eventViewer.GasRangeViewer;
 import com.github.heronerin.secureroute.eventViewer.IncomeViewer;
 import com.github.heronerin.secureroute.eventViewer.NoteViewer;
@@ -220,14 +222,34 @@ public class Event implements Serializable {
     public String eventPreview(){
         if (variety == Empty)
             return "EMPTY EVENT";
-        if (variety == ArbitraryNote || variety == ArbitraryRangeStart || variety == TripStart || variety == TripEnd)
+        if (variety == ArbitraryNote || variety == ArbitraryRangeStart)
             return noteDataHandle(noteData);
+        if (variety == TripStart || variety == TripEnd) {
+            if (associatedPair == -1)
+                return "Ongoing business trip";
+            Event other = DataBase.instance.getEventById(associatedPair);
+            if (other == null)
+                return "Ended business trip";
+
+            String preview = Math.abs(other.odometer - odometer)+" mile business trip lasting " + TripUtils.formatMillisecondsToTime(Math.abs(other.timeStamp-timeStamp));
+
+            return preview;
+
+        }
         if (isRangeEnd(variety))
             return "End of " + getAsRangeStart(variety).toString();
         if (variety == Income)
-            return "+$"+String.valueOf(moneyAmount)+"\n"+noteDataHandle(noteData);
+            return "+$"+ moneyAmount +"\n"+noteDataHandle(noteData);
         if (variety == JobExpense || variety == Expense)
-            return "-$"+String.valueOf(moneyAmount)+"\n"+noteDataHandle(noteData);
+            return "-$"+ moneyAmount +"\n"+noteDataHandle(noteData);
+        if (variety == GasEvent) {
+            String preview = "-$" + moneyAmount + " gas fillup \n";
+            if (associatedPair == -1)
+                preview+="Still ongoing";
+            else
+                preview+="Lasting "+(DataBase.instance.getEventById(associatedPair).odometer-odometer)+" miles";
+            return preview;
+        }
 
 
         return "TODO: Handle this event (" + variety.toString() + ")";
