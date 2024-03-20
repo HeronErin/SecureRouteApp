@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">SecureRoute</string>
-    <string name="serverBase">https://secureroute.librelearn.eu.org/</string>
+    <string name="app_name">Secure Route</string>
+<!--    <string name="serverBase">https://secureroute.librelearn.eu.org/</string>-->
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+<!--    <string name="hello_blank_fragment">Hello blank fragment</string>-->
     <string name="add_an_image_s">Add an image(s)</string>
 
 </resources>

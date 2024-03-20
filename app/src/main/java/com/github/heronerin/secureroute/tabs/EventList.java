@@ -42,7 +42,7 @@ public class EventList extends Fragment {
 
         List<Event> filteredEventList = new ArrayList<>();
         for (Event event : eventList)
-//            if (!Event.isRangeEnd(event.variety))
+            if (!Event.isRangeEnd(event.variety))
                 filteredEventList.add(event);
 
         eventArrayAdapter = new EventArrayAdapter(this.getContext(),

@@ -120,7 +120,7 @@ public class Event implements Serializable {
     @Nullable public String noteData;
     @Nullable private JsonArrayHolder imageData;
 
-    @Nullable public Integer odometer = null;
+    @Nullable public Long odometer = null;
 
     @Nullable
     public JSONArray getImageData() {
@@ -128,7 +128,7 @@ public class Event implements Serializable {
         return imageData.jsonArray;
     }
 
-    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _moneyAmount, int _associatedPair, @Nullable String _noteData, @Nullable JSONArray _imagedata, @Nullable Integer odometer){
+    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _moneyAmount, int _associatedPair, @Nullable String _noteData, @Nullable JSONArray _imagedata, @Nullable Long odometer){
         this.variety = _variety;
         this.eventId = _eventId;
         this.timeStamp = _timeStamp;
@@ -177,7 +177,11 @@ public class Event implements Serializable {
                 }else if(Event.isRangeEnd(range.variety)){
                     for (int i = 0; i < rangeOpensAndColors.size(); i++){
                         if (range.databaseId != -1 && rangeOpensAndColors.get(i).first == range.databaseId){
-                            colorsInUse.remove(rangeOpensAndColors.get(i).second);
+                            for (int ii = 0; ii < colorsInUse.size(); ii++){
+                                if (colorsInUse.get(ii).second.associatedPair != range.databaseId) continue;
+                                colorsInUse.remove(ii);
+                                break;
+                            }
                             rangeOpensAndColors.remove(i);
                             break;
                         }

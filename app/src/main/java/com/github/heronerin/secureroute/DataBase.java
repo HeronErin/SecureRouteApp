@@ -56,7 +56,7 @@ public class DataBase extends SQLiteOpenHelper {
                 "timestamp BIGINT NOT NULL, " +
                 "expense_value DOUBLE PRECISION," +
                 "associated_pair INTEGER," +
-                "odometer INTEGER," +
+                "odometer BIGINT," +
                 "note_data TEXT," +
                 "image_uri TEXT);");
     }
@@ -200,7 +200,7 @@ public class DataBase extends SQLiteOpenHelper {
                 cursor.getString(cursor.getColumnIndexOrThrow("note_data")),
                 cursor.getString(cursor.getColumnIndexOrThrow("image_uri")) != null ? new JSONArray(cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))) : null,
 
-                cursor.getInt(cursor.getColumnIndexOrThrow("odometer"))
+                cursor.getLong(cursor.getColumnIndexOrThrow("odometer"))
         );
         event.databaseId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
         return event;

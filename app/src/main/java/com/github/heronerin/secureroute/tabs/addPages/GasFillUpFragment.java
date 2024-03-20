@@ -88,7 +88,7 @@ public class GasFillUpFragment extends AbstractAddPage {
         String odometerText = ((EditText)getActivity().findViewById(R.id.odometer)).getText().toString();
         return !odometerText.isEmpty()
                 && (
-                        revise != null || DataBase.instance.getLastWithOdometer() == null || Integer.valueOf( odometerText ) >= DataBase.instance.getLastWithOdometer().odometer
+                        revise != null || DataBase.instance.getLastWithOdometer() == null || Long.valueOf( odometerText ) >= DataBase.instance.getLastWithOdometer().odometer
                 );
     }
 
@@ -109,7 +109,7 @@ public class GasFillUpFragment extends AbstractAddPage {
                 -1,
                 ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
                 jsonArray,
-                Integer.valueOf( ((EditText)getActivity().findViewById(R.id.odometer)).getText().toString() )
+                Long.valueOf( ((EditText)getActivity().findViewById(R.id.odometer)).getText().toString() )
         );
     }
 

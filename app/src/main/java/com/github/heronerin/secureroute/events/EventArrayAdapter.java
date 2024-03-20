@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -77,6 +78,8 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
             Intent intent = new Intent(EventArrayAdapter.this.mContext, event.getViewerClass());
             intent.putExtra("event", event.encodeAsString());
             EventArrayAdapter.this.mContext.startActivity(intent);
+
+            Toast.makeText(getContext(), "Id:"+event.databaseId+" A:"+event.associatedPair, Toast.LENGTH_LONG).show();
         });
 
 
