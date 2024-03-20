@@ -87,7 +87,8 @@ public class AddIncomeFragment extends AbstractAddPage {
                     Double.valueOf(amountField.getText().toString()),
                     -1,
                     ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
-                    jsonArray
+                    jsonArray,
+                    null
             );
 
         revise.variety = eventVariety();

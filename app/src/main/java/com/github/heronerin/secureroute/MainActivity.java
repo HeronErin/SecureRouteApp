@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.Notification;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.AddFragment;
 import com.github.heronerin.secureroute.tabs.EventList;
 import com.github.heronerin.secureroute.tabs.SettingsFragment;
@@ -114,9 +116,20 @@ public class MainActivity extends AppCompatActivity {
 
         CameraManager.instance = new CameraManager(this);
 
+        updateNotification(this);
+    }
 
-        startTrip(this);
 
+    public static void updateNotification(Context context){
+        Event e = DataBase.getOrCreate(context).getLastTrip();
+        if (e == null)
+            return;
+        if (e.variety == Event.EventVariety.TripEnd){
+            TripUtils.endTrip(context);
+            return;
+        }
+
+        TripUtils.startTrip(context);
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,

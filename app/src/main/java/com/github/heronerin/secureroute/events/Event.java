@@ -111,13 +111,15 @@ public class Event implements Serializable {
     @Nullable public String noteData;
     @Nullable private JsonArrayHolder imageData;
 
+    @Nullable public Integer odometer = null;
+
     @Nullable
     public JSONArray getImageData() {
         if (imageData == null) return null;
         return imageData.jsonArray;
     }
 
-    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _moneyAmount, int _associatedPair, @Nullable String _noteData, @Nullable JSONArray _imagedata){
+    public Event(EventVariety _variety, UUID _eventId, long _timeStamp, double _moneyAmount, int _associatedPair, @Nullable String _noteData, @Nullable JSONArray _imagedata, @Nullable Integer odometer){
         this.variety = _variety;
         this.eventId = _eventId;
         this.timeStamp = _timeStamp;
@@ -125,6 +127,7 @@ public class Event implements Serializable {
         this.associatedPair=_associatedPair;
         this.noteData = _noteData;
         this.imageData = _imagedata == null ? null :new JsonArrayHolder(_imagedata);
+        this.odometer = odometer;
 //        this.imageUri = _imageUri;
     }
 
@@ -204,7 +207,7 @@ public class Event implements Serializable {
     public String eventPreview(){
         if (variety == Empty)
             return "EMPTY EVENT";
-        if (variety == ArbitraryNote || variety == ArbitraryRangeStart)
+        if (variety == ArbitraryNote || variety == ArbitraryRangeStart || variety == TripStart || variety == TripEnd)
             return noteDataHandle(noteData);
         if (isRangeEnd(variety))
             return "End of " + getAsRangeStart(variety).toString();
@@ -212,6 +215,7 @@ public class Event implements Serializable {
             return "+$"+String.valueOf(moneyAmount)+"\n"+noteDataHandle(noteData);
         if (variety == JobExpense || variety == Expense)
             return "-$"+String.valueOf(moneyAmount)+"\n"+noteDataHandle(noteData);
+
         return "TODO: Handle this event (" + variety.toString() + ")";
     }
     public int getIcon(){
@@ -228,6 +232,10 @@ public class Event implements Serializable {
             return R.drawable.red_dollar_icon;
         if (variety == Expense)
             return R.drawable.yellow_dollar_icon;
+        if (variety == TripStart)
+            return R.drawable.green_car_icon;
+        if (variety == TripEnd)
+            return R.drawable.red_car_icon;
 
         return R.drawable.ic_launcher_foreground;
     }

@@ -1,5 +1,7 @@
 package com.github.heronerin.secureroute.tabs;
 
+import static com.github.heronerin.secureroute.MainActivity.updateNotification;
+
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -19,6 +21,7 @@ import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AbstractAddPage;
 import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
 import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
+import com.github.heronerin.secureroute.tabs.addPages.AddTripFragment;
 import com.github.heronerin.secureroute.tabs.addPages.GasFillUpFragment;
 import com.github.heronerin.secureroute.tabs.addPages.RangeEventAddFragment;
 
@@ -38,6 +41,7 @@ public class AddFragment extends Fragment {
                 AddNoteFragment.newInstance(),
                 AddIncomeFragment.newInstance(),
                 GasFillUpFragment.newInstance(),
+                AddTripFragment.newInstance(),
                 RangeEventAddFragment.newInstance()
         ));
     }
@@ -156,9 +160,10 @@ public class AddFragment extends Fragment {
                 Toast.makeText(this.getContext(), "Error getting event from page, can't add to DB", Toast.LENGTH_LONG).show();
                 return false;
             }
-            Log.d(getTag(), event.getImageData().toString());
             DataBase.getOrCreate(this.getContext()).addEvent(event);
-            Toast.makeText(this.getContext(), "Added page to DB", Toast.LENGTH_LONG).show();
+
+            updateNotification(this.getContext());
+
             currentPage.clearStorage();
 
 

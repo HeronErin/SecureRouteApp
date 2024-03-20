@@ -105,7 +105,8 @@ public class RangeEventAddFragment extends AbstractAddPage {
                     System.currentTimeMillis(),
                     0, -1,
                     ((EditText) getActivity().findViewById(R.id.noteField)).getText().toString(),
-                    jsonArray
+                    jsonArray,
+                    null
                     );
         }
         if (currentMode == 1){
@@ -117,6 +118,7 @@ public class RangeEventAddFragment extends AbstractAddPage {
                     UUID.randomUUID(),
                     System.currentTimeMillis(),
                     0, startEvent.databaseId,
+                    null,
                     null,
                     null
             );
