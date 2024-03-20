@@ -10,6 +10,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import java.time.Duration;
+
 public class TripUtils {
     public static final String ONGOING_TRIP_CHANNEL = "Ongoing Trip";
     public static final int TRIP_NOTIFICATION_ID = 6969;
@@ -48,4 +50,29 @@ public class TripUtils {
     public static void endTrip(Context context){
         NotificationManagerCompat.from(context).cancel(TRIP_NOTIFICATION_ID);
     }
+    public static String formatMillisecondsToTime(long milliseconds) {
+        long seconds = milliseconds / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        long days = hours / 24;
+
+        seconds = seconds % 60;
+        minutes = minutes % 60;
+        hours = hours % 24;
+
+        StringBuilder sb = new StringBuilder();
+        if (days > 0) {
+            sb.append(days).append(" day").append(days > 1 ? "s" : "").append(", ");
+        }
+        if (hours > 0) {
+            sb.append(hours).append(" hour").append(hours > 1 ? "s" : "").append(", ");
+        }
+        if (minutes > 0) {
+            sb.append(minutes).append(" minute").append(minutes > 1 ? "s" : "").append(", ");
+        }
+        sb.append(seconds).append(" second").append(seconds > 1 ? "s" : "");
+
+        return sb.toString();
+    }
+
 }

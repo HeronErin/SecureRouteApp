@@ -28,7 +28,11 @@ import java.util.UUID;
 public class AddTripFragment extends AbstractAddPage {
     @Override
     public boolean isValid() {
-        return true;
+        String odometerText = ((EditText)getActivity().findViewById(R.id.odometerV)).getText().toString();
+        return !odometerText.isEmpty()
+                && (
+                revise != null || DataBase.instance.getLastWithOdometer() == null || Integer.valueOf( odometerText ) >= DataBase.instance.getLastWithOdometer().odometer
+        );
     }
 
     @Override
@@ -38,7 +42,7 @@ public class AddTripFragment extends AbstractAddPage {
                 UUID.randomUUID(),
                 System.currentTimeMillis(),
                 0,
-                isEnding ? lastKnownEnd.associatedPair : -1,
+                isEnding ? lastKnownEnd.databaseId : -1,
                 ((EditText) getActivity().findViewById(R.id.noteField)).getText().toString(),
                 new JSONArray(),
                 Integer.valueOf(((EditText) getActivity().findViewById(R.id.odometerV)).getText().toString())

@@ -71,6 +71,26 @@ public class DataBase extends SQLiteOpenHelper {
             return null;
         return events.get(0);
     }
+
+    @Nullable
+    public Event getLastGas(){
+        List<Event> events = eventsBySql(
+                "SELECT * FROM events WHERE variety = ? ORDER BY timestamp DESC LIMIT 1", new String[]{Event.EventVariety.GasEvent.toString()}, Integer.MAX_VALUE
+        );
+        if (events.isEmpty())
+            return null;
+        return events.get(0);
+    }
+    @Nullable
+    public Event getLastWithOdometer(){
+        String[] possible = new String[]{Event.EventVariety.TripStart.toString(), Event.EventVariety.TripEnd.toString(), Event.EventVariety.GasEvent.toString(), Event.EventVariety.MillageStartJob.toString(), Event.EventVariety.MillageEndJob.toString(), Event.EventVariety.MillageStartNonJob.toString(), Event.EventVariety.MillageEndNonJob.toString()};
+        List<Event> events = eventsBySql(
+                "SELECT * FROM events WHERE variety in ("+StringPlaceHolderGen(possible.length)+") ORDER BY timestamp DESC LIMIT 1", possible, Integer.MAX_VALUE
+        );
+        if (events.isEmpty())
+            return null;
+        return events.get(0);
+    }
     @Nullable
     public Event getEventById(int id){
         List<Event> events = eventsBySql(
@@ -103,6 +123,12 @@ public class DataBase extends SQLiteOpenHelper {
             values.put("associated_pair", (int) id);
             db.update("events", values, "id = ?", new String[]{String.valueOf(event.associatedPair)});
         }
+        if (event.variety == Event.EventVariety.GasEventEnd){
+            ContentValues values = new ContentValues();
+            values.put("associated_pair", (int) id);
+            db.update("events", values, "id = ?", new String[]{String.valueOf(event.associatedPair)});
+        }
+
     }
 
     public synchronized void addEvent(Event event) {
@@ -116,6 +142,7 @@ public class DataBase extends SQLiteOpenHelper {
             values.put("timestamp", event.timeStamp);
             values.put("associated_pair", event.associatedPair);
             values.put("expense_value", event.moneyAmount);
+            values.put("odometer", event.odometer);
 
             if (event.noteData != null)
                 values.put("note_data", event.noteData);
@@ -125,6 +152,8 @@ public class DataBase extends SQLiteOpenHelper {
 
             long id = db.insert("events", null, values);
             customEventSaveHandler(event, id, db);
+            Log.e("Addevent", String.valueOf(id));
+            Log.e("Addevent", event.variety.toString());
 
         } finally {
             if (db != null) {
@@ -176,7 +205,8 @@ public class DataBase extends SQLiteOpenHelper {
         event.databaseId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
         return event;
     }
-    private synchronized List<Event> eventsBySql(String sql, @Nullable String[] args, int limit){
+
+    private List<Event> eventsBySql(String sql, @Nullable String[] args, int limit){
         List<Event> recentEvents = new ArrayList<>();
         SQLiteDatabase db = null;
         Cursor cursor = null;

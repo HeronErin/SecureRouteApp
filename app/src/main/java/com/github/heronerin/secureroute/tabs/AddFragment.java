@@ -25,11 +25,14 @@ import com.github.heronerin.secureroute.tabs.addPages.AddTripFragment;
 import com.github.heronerin.secureroute.tabs.addPages.GasFillUpFragment;
 import com.github.heronerin.secureroute.tabs.addPages.RangeEventAddFragment;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class AddFragment extends Fragment {
 //    private String[] pleaseSelect = new String[]{"No category selected"};
@@ -160,6 +163,26 @@ public class AddFragment extends Fragment {
                 Toast.makeText(this.getContext(), "Error getting event from page, can't add to DB", Toast.LENGTH_LONG).show();
                 return false;
             }
+            if (event.variety == Event.EventVariety.GasEvent){
+                Event e = DataBase.getOrCreate(this.getContext()).getLastGas();
+                Log.e(getTag(), "Found gas: " + e);
+                if (e != null){
+                    Log.e(getTag(), "Found gas: " + e.variety);
+                    Log.e(getTag(), "Found gas: " + e.odometer);
+                    Log.e(getTag(), "Found gas: " + e.databaseId);
+                    DataBase.getOrCreate(this.getContext()).addEvent(new Event(
+                            Event.EventVariety.GasEventEnd,
+                            UUID.randomUUID(),
+                            event.timeStamp - 1,
+                            0,
+                            e.databaseId,
+                            "End gas",
+                            new JSONArray(),
+                            event.odometer
+                    ));
+                }
+            }
+
             DataBase.getOrCreate(this.getContext()).addEvent(event);
 
             updateNotification(this.getContext());

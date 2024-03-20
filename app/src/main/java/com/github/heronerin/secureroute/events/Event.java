@@ -8,8 +8,10 @@ import android.util.Pair;
 import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.eventViewer.GasRangeViewer;
 import com.github.heronerin.secureroute.eventViewer.IncomeViewer;
 import com.github.heronerin.secureroute.eventViewer.NoteViewer;
+import com.github.heronerin.secureroute.eventViewer.TripViewer;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
@@ -55,10 +57,10 @@ public class Event implements Serializable {
     }
 
     public static boolean isRangeStart(EventVariety v){
-        return  v == ArbitraryRangeStart || v == MillageStartJob || v == MillageStartNonJob;
+        return  v == ArbitraryRangeStart || v == MillageStartJob || v == MillageStartNonJob || v == GasEvent;
     }
     public static boolean isRangeEnd(EventVariety v){
-        return  v == ArbitraryRangeEnd || v == MillageEndJob || v == MillageEndNonJob;
+        return  v == ArbitraryRangeEnd || v == MillageEndJob || v == MillageEndNonJob || v == GasEventEnd;
     }
     public static EventVariety getAsRangeStart(EventVariety v){
         if (v == ArbitraryRangeEnd)
@@ -67,6 +69,8 @@ public class Event implements Serializable {
             return MillageStartJob;
         if (v == MillageEndNonJob)
             return MillageStartNonJob;
+        if (v == GasEventEnd)
+            return GasEvent;
         return null;
     }
     public static String[] possibleRangeStrings = new String[]{
@@ -78,6 +82,9 @@ public class Event implements Serializable {
 
             MillageStartNonJob.toString(),
             MillageEndNonJob.toString(),
+
+            GasEvent.toString(),
+            GasEventEnd.toString()
 
     };
     public boolean[] rangeCache = new boolean[]{false, false, false, false, false};
@@ -92,6 +99,8 @@ public class Event implements Serializable {
         MillageStartNonJob,
         TripStart,
         TripEnd,
+        GasEvent,
+        GasEventEnd,
         MillageEndNonJob,
         JobExpense,
         Expense,
@@ -216,6 +225,7 @@ public class Event implements Serializable {
         if (variety == JobExpense || variety == Expense)
             return "-$"+String.valueOf(moneyAmount)+"\n"+noteDataHandle(noteData);
 
+
         return "TODO: Handle this event (" + variety.toString() + ")";
     }
     public int getIcon(){
@@ -236,6 +246,10 @@ public class Event implements Serializable {
             return R.drawable.green_car_icon;
         if (variety == TripEnd)
             return R.drawable.red_car_icon;
+        if (variety == GasEvent)
+            return R.drawable.pump_icon;
+        if (variety == GasEventEnd)
+            return R.drawable.graph_up;
 
         return R.drawable.ic_launcher_foreground;
     }
@@ -268,6 +282,10 @@ public class Event implements Serializable {
     public  Class<?> getViewerClass(){
         if (variety == Expense || variety == Income || variety == JobExpense)
             return IncomeViewer.class;
+        if (variety == TripStart || variety == TripEnd)
+            return TripViewer.class;
+        if (variety == GasEvent)
+            return GasRangeViewer.class;
         return NoteViewer.class;
     }
 

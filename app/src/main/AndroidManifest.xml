@@ -20,6 +20,12 @@
         android:theme="@style/Theme.SecureRouteKeeper"
         tools:targetApi="31">
         <activity
+            android:name=".eventViewer.GasRangeViewer"
+            android:exported="false" />
+        <activity
+            android:name=".eventViewer.TripViewer"
+            android:exported="false" />
+        <activity
             android:name=".eventViewer.NoteViewer"
             android:exported="false" />
         <activity
@@ -34,7 +40,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

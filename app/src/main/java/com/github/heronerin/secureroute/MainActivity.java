@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         CameraManager.instance = new CameraManager(this);
 
         updateNotification(this);
+//        Log.w("GotFromDb", String.valueOf(DataBase.instance.getLastWithOdometer().odometer));
     }
 
 
@@ -138,8 +139,6 @@ public class MainActivity extends AppCompatActivity {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode != 69) return;
-        Log.d("RES", Arrays.toString(grantResults));
-        Log.d("RES", Arrays.toString(permissions));
         for (int perResult : grantResults) {
             if (perResult == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(this, "These permissions are not optional!", Toast.LENGTH_LONG).show();

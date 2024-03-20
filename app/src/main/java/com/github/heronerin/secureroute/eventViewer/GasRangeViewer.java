@@ -2,8 +2,6 @@ package com.github.heronerin.secureroute.eventViewer;
 
 import static com.github.heronerin.secureroute.eventViewer.NoteViewer.handleNoteViewAndImgs;
 
-import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -16,46 +14,30 @@ import androidx.core.view.WindowInsetsCompat;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
-import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 
-public class IncomeViewer extends AppCompatActivity {
+public class GasRangeViewer extends AppCompatActivity {
+
     Event event;
-    @SuppressLint({"MissingInflatedId", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.income_viewer);
-
         EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_gas_range_viewer);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-
         Bundle extras = getIntent().getExtras();
         assert extras != null;
 
         event = Event.decodeFromString(extras.getString("event"));
         handleNoteViewAndImgs(event, this, AddIncomeFragment.class);
-        TextView amount = findViewById(R.id.spendAmount);
-        if (event.variety == Event.EventVariety.Income){
-            amount.setTextColor(Color.GREEN);
-            amount.setText("$"+event.moneyAmount);
-        }
-        if (event.variety == Event.EventVariety.Income){
-            amount.setTextColor(Color.GREEN);
-            amount.setText("$"+event.moneyAmount);
-        }
-        if (event.variety == Event.EventVariety.JobExpense){
-            amount.setTextColor(Color.RED);
-            amount.setText("$"+event.moneyAmount +" spent on the job");
-        }
-        if (event.variety == Event.EventVariety.Expense){
-            amount.setTextColor(0xFFFFD700);
-            amount.setText("$"+event.moneyAmount +" spent");
-        }
+        TextView spend = findViewById(R.id.spendAmount);
+        spend.setText("Amount spend: $" + event.moneyAmount);
+        if (event.associatedPair == -1){
 
+        }
     }
 }
