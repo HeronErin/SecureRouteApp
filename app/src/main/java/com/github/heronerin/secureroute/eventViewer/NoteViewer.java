@@ -1,36 +1,24 @@
 package com.github.heronerin.secureroute.eventViewer;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.PopupMenu;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.widget.NestedScrollView;
 
 import com.bumptech.glide.Glide;
 import com.github.heronerin.secureroute.ImageViewerFragment;
@@ -41,7 +29,6 @@ import com.github.heronerin.secureroute.events.EventArrayAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,23 +98,19 @@ public class NoteViewer extends AppCompatActivity {
         listView.setLayoutParams(params);
     }
     Event event;
-    @SuppressLint("MissingInflatedId")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_note_viewer);
 
 
-        Bundle extras = getIntent().getExtras();
-        assert extras != null;
+    public static void handleNoteViewAndImgs(Event event, AppCompatActivity activity){
+        ((ImageView)activity.findViewById(R.id.eventVirietyPreview)).setImageResource(event.getIcon());
 
-        event = Event.decodeFromString(extras.getString("event"));
-
-        ((TextView)findViewById(R.id.noteData)).setText(event.noteData);
+        ((TextView)activity.findViewById(R.id.noteData)).setText(event.noteData);
         List<ImageViewerFragment.ImgTitleCombo> imageComboList = new ArrayList<>();
-        ImageAdaptor imageAdaptor = new ImageAdaptor(this, imageComboList);
+        ImageAdaptor imageAdaptor = new ImageAdaptor(activity, imageComboList);
 
         JSONArray jsonImgs = event.getImageData();
+
+        if (jsonImgs.length() == 0)
+            activity.findViewById(R.id.imagesTitle).setVisibility(View.GONE);
 
         try {
             for (int i = 0; i < jsonImgs.length(); i++){
@@ -139,15 +122,33 @@ public class NoteViewer extends AppCompatActivity {
         }
 
 
-        ((ListView) findViewById(R.id.imageDisplayHolder)).setAdapter(imageAdaptor);
-        if (event.cachedRanges.size() == 0)
-            findViewById(R.id.memberOf).setVisibility(View.GONE);
-        Log.d("NoteView", "Amount of ranges: "+String.valueOf(event.cachedRanges.size()));
-        EventArrayAdapter eventArrayAdapter = new EventArrayAdapter(this, event.cachedRanges);
-        ((ListView)findViewById(R.id.ranges)).setAdapter(eventArrayAdapter);
+        ((ListView) activity.findViewById(R.id.imageDisplayHolder)).setAdapter(imageAdaptor);
+        if (event.cachedRanges.isEmpty())
+            activity.findViewById(R.id.rangesTitle).setVisibility(View.GONE);
+        Log.d("NoteView", "Amount of ranges: "+ event.cachedRanges.size());
+        EventArrayAdapter eventArrayAdapter = new EventArrayAdapter(activity, event.cachedRanges);
+        ((ListView)activity.findViewById(R.id.ranges)).setAdapter(eventArrayAdapter);
 
-        setListViewHeightBasedOnChildren(((ListView)findViewById(R.id.imageDisplayHolder)));
+        setListViewHeightBasedOnChildren(((ListView)activity.findViewById(R.id.imageDisplayHolder)));
 
+        if (event.cachedRanges.isEmpty())
+            activity.findViewById(R.id.rangesTitle).setVisibility(View.GONE);
+    }
+
+    @SuppressLint("MissingInflatedId")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_note_viewer);
+
+        EdgeToEdge.enable(this);
+
+
+        Bundle extras = getIntent().getExtras();
+        assert extras != null;
+
+        event = Event.decodeFromString(extras.getString("event"));
+        handleNoteViewAndImgs(event, this);
 
     }
 }

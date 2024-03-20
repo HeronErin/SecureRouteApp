@@ -25,6 +25,7 @@ import com.github.heronerin.secureroute.events.Event;
 import org.json.JSONArray;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 @SuppressLint("MissingInflatedId")
@@ -69,15 +70,19 @@ public class AddNoteFragment extends AbstractAddPage {
             jsonArray = CameraManager.instance.getTempJsonArray();
         }
 
-        return new Event(
-                Event.EventVariety.ArbitraryNote,
-                UUID.randomUUID(),
-                System.currentTimeMillis(),
-                0,
-                -1,
-                ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
-                jsonArray
-        );
+        if (revise == null)
+            return new Event(
+                    Event.EventVariety.ArbitraryNote,
+                    UUID.randomUUID(),
+                    System.currentTimeMillis(),
+                    0,
+                    -1,
+                    ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
+                    jsonArray
+            );
+        revise.noteData =  ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString();
+        revise.setImageData(jsonArray);
+        return revise;
     }
 
     public AddNoteFragment() {
@@ -95,7 +100,7 @@ public class AddNoteFragment extends AbstractAddPage {
     SharedPreferences sharedPreferences;
     boolean usingImages = false;
 
-
+    Event revise = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -103,10 +108,24 @@ public class AddNoteFragment extends AbstractAddPage {
         View v =  inflater.inflate(R.layout.fragment_add_note_activity, container, false);
 
         sharedPreferences = getActivity().getSharedPreferences("AutoSave", Context.MODE_PRIVATE);
-        String note = sharedPreferences.getString("noteBox", "");
 
         EditText et = v.findViewById(R.id.noteField);
-        et.setText(note);
+
+
+        String note = sharedPreferences.getString("noteBox", "");
+
+        Bundle args = this.getArguments();
+        if (args == null)
+            et.setText(note);
+        else{
+            revise = Event.decodeFromString(args.getString("event"));
+            try {
+                CameraManager.instance.putTempJsonArray(revise.getImageData());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            et.setText(revise.noteData);
+        }
         et.setOnFocusChangeListener((v1, hasFocus) -> {
             SharedPreferences.Editor e = sharedPreferences.edit();
             e.putString("noteBox", ((EditText) v1).getText().toString());

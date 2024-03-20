@@ -23,6 +23,9 @@
             android:name=".eventViewer.NoteViewer"
             android:exported="false" />
         <activity
+            android:name=".eventViewer.IncomeViewer"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

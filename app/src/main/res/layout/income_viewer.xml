@@ -30,6 +30,14 @@
                 app:srcCompat="@drawable/note_icon" />
 
             <TextView
+                android:id="@+id/spendAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Amount spent"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+            <TextView
                 android:id="@+id/noteData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -62,16 +70,6 @@
         </LinearLayout>
     </ScrollView>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/revisionMenu"
-        android:name="com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

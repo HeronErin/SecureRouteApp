@@ -36,6 +36,7 @@ public class AddIncomeFragment extends AbstractAddPage {
         e.putString("noteBox", "");
         e.putString("addAmount", "");
         e.apply();
+
         ((EditText)getActivity().findViewById(R.id.noteField)).setText("");
         if (usingImages){
             String path = CameraManager.instance.getTempPath();
@@ -78,15 +79,23 @@ public class AddIncomeFragment extends AbstractAddPage {
         }
         EditText amountField = getActivity().findViewById(R.id.addAmount);
 
-        return new Event(
-                eventVariety(),
-                UUID.randomUUID(),
-                System.currentTimeMillis(),
-                Double.valueOf(amountField.getText().toString()),
-                -1,
-                ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
-                jsonArray
-        );
+        if (revise == null)
+            return new Event(
+                    eventVariety(),
+                    UUID.randomUUID(),
+                    System.currentTimeMillis(),
+                    Double.valueOf(amountField.getText().toString()),
+                    -1,
+                    ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
+                    jsonArray
+            );
+
+        revise.variety = eventVariety();
+        revise.moneyAmount = Double.valueOf(amountField.getText().toString());
+        revise.noteData =  ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString();
+        revise.setImageData(jsonArray);
+
+        return revise;
     }
 
     public AddIncomeFragment() {
@@ -103,11 +112,12 @@ public class AddIncomeFragment extends AbstractAddPage {
     SharedPreferences sharedPreferences;
     boolean usingImages = false;
 
+    Event revise = null;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View v =  inflater.inflate(R.layout.fragment_add_income, container, false);
 
         sharedPreferences = getActivity().getSharedPreferences("AutoSave", Context.MODE_PRIVATE);
@@ -123,10 +133,18 @@ public class AddIncomeFragment extends AbstractAddPage {
             e.putString("addAmount", amountField.getText().toString());
             e.apply();
         };
+        Bundle args = this.getArguments();
+        if (args == null) {
+            amountField.setText(sharedPreferences.getString("addAmount", ""));
 
-        amountField.setText(sharedPreferences.getString("addAmount", ""));
+            noteField.setText(sharedPreferences.getString("noteBox", ""));
+        }else{
+            revise = Event.decodeFromString(args.getString("event"));
 
-        noteField.setText(sharedPreferences.getString("noteBox", ""));
+            amountField.setText(String.valueOf(revise.moneyAmount));
+
+            noteField.setText(revise.noteData);
+        }
         noteField.setOnFocusChangeListener(focus);
 
 
@@ -145,6 +163,7 @@ public class AddIncomeFragment extends AbstractAddPage {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
     }
+
 
 
 }

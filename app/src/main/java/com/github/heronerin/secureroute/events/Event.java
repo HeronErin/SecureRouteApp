@@ -8,6 +8,7 @@ import android.util.Pair;
 import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.eventViewer.IncomeViewer;
 import com.github.heronerin.secureroute.eventViewer.NoteViewer;
 
 import org.apache.commons.codec.binary.Base64;
@@ -125,6 +126,9 @@ public class Event implements Serializable {
 //        this.imageUri = _imageUri;
     }
 
+    public void setImageData(@Nullable JSONArray imageData) {
+        this.imageData = imageData == null ? null :new JsonArrayHolder(imageData);
+    }
 
     public static void applyRanges(List<Event> events, List<Event> ranges){
         Collections.sort(events, (o1, o2) -> Long.compare(o1.timeStamp, o2.timeStamp));
@@ -252,7 +256,8 @@ public class Event implements Serializable {
         }
     }
     public  Class<?> getViewerClass(){
-
+        if (variety == Expense || variety == Income || variety == JobExpense)
+            return IncomeViewer.class;
         return NoteViewer.class;
     }
 
