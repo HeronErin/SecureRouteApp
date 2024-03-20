@@ -104,6 +104,34 @@ public class DataBase extends SQLiteOpenHelper {
             }
         }
     }
+    public synchronized void updateEvent(Event event) {
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put("variety", event.variety.toString());
+            values.put("event_id", event.eventId.toString());
+            values.put("timestamp", event.timeStamp);
+            values.put("associated_pair", event.associatedPair);
+            values.put("expense_value", event.moneyAmount);
+
+            if (event.noteData != null)
+                values.put("note_data", event.noteData);
+
+            if (event.getImageData() != null)
+                values.put("image_uri", event.getImageData().toString());
+
+
+            long id = db.update("events", values, "id = ?", new String[]{String.valueOf(event.databaseId)});
+            customEventSaveHandler(event, id, db);
+
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
     private Event eventFromCursor(Cursor cursor) throws JSONException {
         Event event = new Event(
                 Event.EventVariety.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("variety"))),

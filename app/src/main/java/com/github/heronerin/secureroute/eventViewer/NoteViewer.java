@@ -1,6 +1,7 @@
 package com.github.heronerin.secureroute.eventViewer;
 
 import android.annotation.SuppressLint;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,10 +22,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.ImageViewerFragment;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.events.EventArrayAdapter;
+import com.github.heronerin.secureroute.tabs.addPages.AbstractAddPage;
+import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -100,7 +104,7 @@ public class NoteViewer extends AppCompatActivity {
     Event event;
 
 
-    public static void handleNoteViewAndImgs(Event event, AppCompatActivity activity){
+    public static void handleNoteViewAndImgs(Event event, AppCompatActivity activity, Class<?> fragmentCls){
         ((ImageView)activity.findViewById(R.id.eventVirietyPreview)).setImageResource(event.getIcon());
 
         ((TextView)activity.findViewById(R.id.noteData)).setText(event.noteData);
@@ -133,6 +137,39 @@ public class NoteViewer extends AppCompatActivity {
 
         if (event.cachedRanges.isEmpty())
             activity.findViewById(R.id.rangesTitle).setVisibility(View.GONE);
+
+        activity.findViewById(R.id.eventVirietyPreview).setOnClickListener((v)->{
+            try {
+                final AbstractAddPage fragment = (AbstractAddPage) fragmentCls.newInstance();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("event", event.encodeAsString());
+                fragment.setArguments(bundle);
+
+                activity.findViewById(R.id.revisionMenu).setVisibility(View.VISIBLE);
+                activity.findViewById(R.id.commitChanges).setVisibility(View.VISIBLE);
+                activity.findViewById(R.id.noteViewScroll).setVisibility(View.GONE);
+                activity.getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.revisionMenu, fragment)
+                        .commit();
+                activity.findViewById(R.id.commitChanges).setOnClickListener((vv)->{
+                    if (!fragment.isValid()) return;
+
+                    activity.findViewById(R.id.revisionMenu).setVisibility(View.GONE);
+                    activity.findViewById(R.id.commitChanges).setVisibility(View.GONE);
+                    activity.findViewById(R.id.noteViewScroll).setVisibility(View.VISIBLE);
+
+                    DataBase.getOrCreate(activity).updateEvent(fragment.genValidEvent());
+                    activity.finish();
+                });
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
     }
 
     @SuppressLint("MissingInflatedId")
@@ -148,7 +185,8 @@ public class NoteViewer extends AppCompatActivity {
         assert extras != null;
 
         event = Event.decodeFromString(extras.getString("event"));
-        handleNoteViewAndImgs(event, this);
+        handleNoteViewAndImgs(event, this, AddNoteFragment.class);
+
 
     }
 }

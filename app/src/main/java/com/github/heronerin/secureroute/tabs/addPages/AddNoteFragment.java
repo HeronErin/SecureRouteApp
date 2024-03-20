@@ -81,7 +81,7 @@ public class AddNoteFragment extends AbstractAddPage {
                     jsonArray
             );
         revise.noteData =  ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString();
-        revise.setImageData(jsonArray);
+
         return revise;
     }
 
@@ -119,6 +119,7 @@ public class AddNoteFragment extends AbstractAddPage {
             et.setText(note);
         else{
             revise = Event.decodeFromString(args.getString("event"));
+            v.findViewById(R.id.addImg).setVisibility(View.GONE);
             try {
                 CameraManager.instance.putTempJsonArray(revise.getImageData());
             } catch (IOException e) {

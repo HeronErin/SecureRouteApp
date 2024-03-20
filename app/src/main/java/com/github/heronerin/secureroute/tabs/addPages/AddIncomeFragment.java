@@ -93,7 +93,7 @@ public class AddIncomeFragment extends AbstractAddPage {
         revise.variety = eventVariety();
         revise.moneyAmount = Double.valueOf(amountField.getText().toString());
         revise.noteData =  ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString();
-        revise.setImageData(jsonArray);
+//        revise.setImageData(jsonArray);
 
         return revise;
     }
@@ -144,6 +144,14 @@ public class AddIncomeFragment extends AbstractAddPage {
             amountField.setText(String.valueOf(revise.moneyAmount));
 
             noteField.setText(revise.noteData);
+            v.findViewById(R.id.addImg).setVisibility(View.GONE);
+
+            if (revise.variety == Event.EventVariety.Income)
+                setMode(0);
+            if (revise.variety == Event.EventVariety.Expense)
+                setMode(1);
+            if (revise.variety == Event.EventVariety.JobExpense)
+                setMode(2);
         }
         noteField.setOnFocusChangeListener(focus);
 

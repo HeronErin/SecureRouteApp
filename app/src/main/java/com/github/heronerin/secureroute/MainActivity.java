@@ -1,8 +1,11 @@
 package com.github.heronerin.secureroute;
 
+import static com.github.heronerin.secureroute.TripUtils.startTrip;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.app.Notification;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -89,7 +92,11 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        String[] perms =  new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+        String[] perms  = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            perms = Arrays.copyOf(perms, perms.length + 1);
+            perms[perms.length - 1] = Manifest.permission.POST_NOTIFICATIONS;
+        }
         List<String> needs = new ArrayList<>();
         boolean needsPerm = false;
         for (String perm : perms){
@@ -107,6 +114,9 @@ public class MainActivity extends AppCompatActivity {
 
         CameraManager.instance = new CameraManager(this);
 
+
+        startTrip(this);
+
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -117,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode != 69) return;
         Log.d("RES", Arrays.toString(grantResults));
         Log.d("RES", Arrays.toString(permissions));
-        for (int perResult : grantResults){
-            if (perResult == PackageManager.PERMISSION_DENIED){
+        for (int perResult : grantResults) {
+            if (perResult == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(this, "These permissions are not optional!", Toast.LENGTH_LONG).show();
                 this.finish();
             }

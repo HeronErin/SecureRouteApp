@@ -90,6 +90,8 @@ public class Event implements Serializable {
         MillageStartJob,
         MillageEndJob,
         MillageStartNonJob,
+        TripStart,
+        TripEnd,
         MillageEndNonJob,
         JobExpense,
         Expense,
