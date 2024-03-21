@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -15,8 +17,10 @@ import androidx.annotation.NonNull;
 
 import com.github.heronerin.secureroute.DataBase;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class EventEditUtils {
 
@@ -153,6 +157,30 @@ public class EventEditUtils {
                 db.deleteEvent(event);
             }, "Are truly you sure?", "This actually can't be undone!", context),
                     "Are you sure?", "Deleting an event is something that can't be undone!", context);
+            return true;
+        };
+    }
+    public static MenuItem.OnMenuItemClickListener transmuteVariety(Context context, Event event, List<Event.EventVariety> varietyList){
+
+        return item -> {
+            if (event.odometer == null) return true;
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+            alert.setTitle("Edit type");
+            Spinner spinner = new Spinner(context);
+            List<String> strings = new ArrayList<>();
+            
+            ArrayAdapter<String> varietyAdaptor = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, strings);
+            spinner.setAdapter(varietyAdaptor);
+
+
+            alert.setPositiveButton("Ok", (dialog, whichButton) -> {
+//                event.odometer = Long.valueOf(editText.getText().toString());
+//                DataBase.getOrCreate(context).updateEvent(event);
+            });
+            alert.setNegativeButton("Cancel", (dialog, whichButton) -> {});
+
+            alert.show();
             return true;
         };
     }
