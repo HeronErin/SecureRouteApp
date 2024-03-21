@@ -2,9 +2,13 @@ package com.github.heronerin.secureroute.events;
 
 import static com.github.heronerin.secureroute.events.Event.EventVariety.*;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.DataBase;
@@ -313,6 +317,19 @@ public class Event implements Serializable {
         if (variety == GasEvent)
             return GasRangeViewer.class;
         return NoteViewer.class;
+    }
+
+    public void handleContext(Context context, ContextMenu menu) {
+
+//        menu.add("asd").setOnMenuItemClickListener()
+        menu.add("Edit time").setOnMenuItemClickListener(EventEditUtils.editTime(context, this));
+        if (variety == GasEvent || variety == Income || variety == JobExpense || variety == Expense)
+            menu.add("Edit money amount").setOnMenuItemClickListener(EventEditUtils.editMoney(context, this));
+        if (variety == GasEvent || variety == TripStart || variety == TripEnd)
+            menu.add("Edit odometer").setOnMenuItemClickListener(EventEditUtils.editOdometer(context, this));
+        if (variety == ArbitraryNote)
+            menu.add("Edit note").setOnMenuItemClickListener(EventEditUtils.editNote(context, this));
+
     }
 
 

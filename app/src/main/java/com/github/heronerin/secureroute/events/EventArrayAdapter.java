@@ -4,9 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.ActionProvider;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,10 +35,12 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
     private Context mContext;
     private List<Event> eventList = new ArrayList<>();
 
-    public EventArrayAdapter(@NonNull Context context, List<Event> list) {
+    private boolean hasMenu;
+    public EventArrayAdapter(@NonNull Context context, List<Event> list, boolean hasMenu) {
         super(context, 0 , list);
         mContext = context;
         eventList = list;
+        this.hasMenu=hasMenu;
     }
 
     @Override
@@ -81,8 +88,10 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
 
             Toast.makeText(getContext(), "Id:"+event.databaseId+" A:"+event.associatedPair, Toast.LENGTH_LONG).show();
         });
-
+        if (hasMenu)
+            listItem.setOnCreateContextMenuListener((menu, v, menuInfo) -> event.handleContext(mContext, menu));
 
         return listItem;
     }
+
 }

@@ -114,7 +114,10 @@ public class MainActivity extends AppCompatActivity {
             findViewById(btn).setOnClickListener(this::onTabClick);
         findViewById(btns[0]).callOnClick();
 
-        CameraManager.instance = new CameraManager(this);
+        if (CameraManager.instance == null)
+            CameraManager.instance = new CameraManager(this);
+        else
+            CameraManager.instance.activity = this;
 
         updateNotification(this);
 //        Log.w("GotFromDb", String.valueOf(DataBase.instance.getLastWithOdometer().odometer));

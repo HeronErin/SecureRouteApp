@@ -1,11 +1,9 @@
 package com.github.heronerin.secureroute;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentContainerView;
 
 import org.json.JSONArray;
@@ -26,30 +24,27 @@ import java.nio.charset.StandardCharsets;
 public class CameraManager {
     public static CameraManager instance = null;
     private Runnable onExit = null;
-    private MainActivity mainActivity;
+    public AppCompatActivity activity;
 
-    CameraManager(MainActivity _mainActivity){
-        mainActivity=_mainActivity;
+    CameraManager(AppCompatActivity _mainActivity){
+        activity =_mainActivity;
     }
-    public String getTempPath(){ return DataBase.getOrCreate(mainActivity).databaseUri+"/temp.json"; }
-    public void openTemp(AppCompatActivity activityCompat, @Nullable Runnable _onExit){
+    public String getTempPath(){ return DataBase.getOrCreate(activity).databaseUri+"/temp.json"; }
+    public void openTemp(@Nullable Runnable _onExit){
         onExit=_onExit;
 
-        activityCompat.runOnUiThread(()->{
-            FragmentContainerView frag = activityCompat.findViewById(R.id.imgViewFragContainer);
+        activity.runOnUiThread(()->{
+            FragmentContainerView frag = activity.findViewById(R.id.imgViewFragContainer);
             frag.setVisibility(View.VISIBLE);
-            activityCompat.getSupportFragmentManager()
+            activity.getSupportFragmentManager()
                     .beginTransaction()
                     .replace(frag.getId(),  ImageViewerFragment.newInstance(getTempPath(), true))
                     .commit();
         });
     }
-    public void openTemp(@Nullable Runnable _onExit){
-        openTemp(mainActivity, _onExit);
-    }
     public void handleExit(){
-        mainActivity.runOnUiThread(()->{
-            FragmentContainerView frag = mainActivity.findViewById(R.id.imgViewFragContainer);
+        activity.runOnUiThread(()->{
+            FragmentContainerView frag = activity.findViewById(R.id.imgViewFragContainer);
             frag.setVisibility(View.GONE);
             if (onExit != null) onExit.run();
             onExit = null;

@@ -133,7 +133,7 @@ public class NoteViewer extends AppCompatActivity {
         if (event.cachedRanges.isEmpty())
             activity.findViewById(R.id.rangesTitle).setVisibility(View.GONE);
         Log.d("NoteView", "Amount of ranges: "+ event.cachedRanges.size());
-        EventArrayAdapter eventArrayAdapter = new EventArrayAdapter(activity, event.cachedRanges);
+        EventArrayAdapter eventArrayAdapter = new EventArrayAdapter(activity, event.cachedRanges, false);
         ((ListView)activity.findViewById(R.id.ranges)).setAdapter(eventArrayAdapter);
 
         setListViewHeightBasedOnChildren(((ListView)activity.findViewById(R.id.imageDisplayHolder)));
@@ -156,16 +156,7 @@ public class NoteViewer extends AppCompatActivity {
                         .beginTransaction()
                         .replace(R.id.revisionMenu, fragment)
                         .commit();
-                activity.findViewById(R.id.commitChanges).setOnClickListener((vv)->{
-                    if (!fragment.isValid()) return;
 
-                    activity.findViewById(R.id.revisionMenu).setVisibility(View.GONE);
-                    activity.findViewById(R.id.commitChanges).setVisibility(View.GONE);
-                    activity.findViewById(R.id.noteViewScroll).setVisibility(View.VISIBLE);
-
-                    DataBase.getOrCreate(activity).updateEvent(fragment.genValidEvent());
-                    activity.finish();
-                });
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InstantiationException e) {
