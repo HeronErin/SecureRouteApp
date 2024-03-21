@@ -1,5 +1,10 @@
 This is very early **WIP** and is not meant to be used by **anybody**!!! It is to track miles and calculate profits/taxes for uber drivers. 
 
+Light                      |  Dark
+:-------------------------:|:-------------------------:
+![](screenshots/home.png)  |  ![](screenshots/home_dark.png)
+
+
 ## Copyright
 
 ```plaintext
