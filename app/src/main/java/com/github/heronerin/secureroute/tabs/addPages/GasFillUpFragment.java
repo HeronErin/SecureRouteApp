@@ -25,7 +25,6 @@ public class GasFillUpFragment extends AbstractAddPage {
         // Required empty public constructor
     }
     SharedPreferences sharedPreferences;
-    Event revise;
     public static GasFillUpFragment newInstance() {
         GasFillUpFragment fragment = new GasFillUpFragment();
         return fragment;
@@ -55,14 +54,7 @@ public class GasFillUpFragment extends AbstractAddPage {
             odometer.setText(sharedPreferences.getString("odometer", ""));
             gasFillupCost.setText(sharedPreferences.getString("gasFillupCost", ""));
         }else{
-            revise = Event.decodeFromString(args.getString("event"));
-            v.findViewById(R.id.addImg).setVisibility(View.GONE);
-            try {
-                CameraManager.instance.putTempJsonArray(revise.getImageData());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            noteField.setText(revise.noteData);
+            throw new RuntimeException();
         }
         View.OnFocusChangeListener focusChangeListener = (v1, hasFocus) -> {
             SharedPreferences.Editor e = sharedPreferences.edit();
@@ -88,7 +80,7 @@ public class GasFillUpFragment extends AbstractAddPage {
         String odometerText = ((EditText)getActivity().findViewById(R.id.odometer)).getText().toString();
         return !odometerText.isEmpty()
                 && (
-                        revise != null || DataBase.instance.getLastWithOdometer() == null || Long.valueOf( odometerText ) >= DataBase.instance.getLastWithOdometer().odometer
+                        DataBase.instance.getLastWithOdometer() == null || Long.valueOf( odometerText ) >= DataBase.instance.getLastWithOdometer().odometer
                 );
     }
 

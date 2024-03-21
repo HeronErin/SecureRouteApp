@@ -70,20 +70,17 @@ public class AddNoteFragment extends AbstractAddPage {
             jsonArray = CameraManager.instance.getTempJsonArray();
         }
 
-        if (revise == null)
-            return new Event(
-                    Event.EventVariety.ArbitraryNote,
-                    UUID.randomUUID(),
-                    System.currentTimeMillis(),
-                    0,
-                    -1,
-                    ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
-                    jsonArray,
-                    null
-            );
-        revise.noteData =  ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString();
 
-        return revise;
+        return new Event(
+                Event.EventVariety.ArbitraryNote,
+                UUID.randomUUID(),
+                System.currentTimeMillis(),
+                0,
+                -1,
+                ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
+                jsonArray,
+                null
+        );
     }
 
     public AddNoteFragment() {
@@ -101,7 +98,6 @@ public class AddNoteFragment extends AbstractAddPage {
     SharedPreferences sharedPreferences;
     boolean usingImages = false;
 
-    Event revise = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -119,14 +115,7 @@ public class AddNoteFragment extends AbstractAddPage {
         if (args == null)
             et.setText(note);
         else{
-            revise = Event.decodeFromString(args.getString("event"));
-            v.findViewById(R.id.addImg).setVisibility(View.GONE);
-            try {
-                CameraManager.instance.putTempJsonArray(revise.getImageData());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            et.setText(revise.noteData);
+            throw new RuntimeException();
         }
         et.setOnFocusChangeListener((v1, hasFocus) -> {
             SharedPreferences.Editor e = sharedPreferences.edit();

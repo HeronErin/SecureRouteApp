@@ -31,7 +31,7 @@ public class AddTripFragment extends AbstractAddPage {
         String odometerText = ((EditText)getActivity().findViewById(R.id.odometerV)).getText().toString();
         return !odometerText.isEmpty()
                 && (
-                revise != null || DataBase.instance.getLastWithOdometer() == null || Long.valueOf( odometerText ) >= DataBase.instance.getLastWithOdometer().odometer
+                DataBase.instance.getLastWithOdometer() == null || Long.valueOf( odometerText ) >= DataBase.instance.getLastWithOdometer().odometer
         );
     }
 
@@ -50,7 +50,6 @@ public class AddTripFragment extends AbstractAddPage {
     }
 
     SharedPreferences sharedPreferences;
-    Event revise = null;
     @Override
     public void clearStorage() {
         SharedPreferences.Editor e = sharedPreferences.edit();
@@ -120,10 +119,7 @@ public class AddTripFragment extends AbstractAddPage {
             noteField.setText(sharedPreferences.getString("noteBox", ""));
             odometer.setText(sharedPreferences.getString("odometer", ""));
         }else{
-            revise = Event.decodeFromString(args.getString("event"));
-            noteField.setText(revise.noteData);
-            if (revise.odometer != null)
-                odometer.setText(String.valueOf(revise.odometer));
+            throw new RuntimeException();
         }
 
         if (!isEnding) {

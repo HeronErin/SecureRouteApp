@@ -79,24 +79,19 @@ public class AddIncomeFragment extends AbstractAddPage {
         }
         EditText amountField = getActivity().findViewById(R.id.addAmount);
 
-        if (revise == null)
-            return new Event(
-                    eventVariety(),
-                    UUID.randomUUID(),
-                    System.currentTimeMillis(),
-                    Double.valueOf(amountField.getText().toString()),
-                    -1,
-                    ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
-                    jsonArray,
-                    null
-            );
 
-        revise.variety = eventVariety();
-        revise.moneyAmount = Double.valueOf(amountField.getText().toString());
-        revise.noteData =  ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString();
-//        revise.setImageData(jsonArray);
+        return new Event(
+                eventVariety(),
+                UUID.randomUUID(),
+                System.currentTimeMillis(),
+                Double.valueOf(amountField.getText().toString()),
+                -1,
+                ((EditText)getActivity().findViewById(R.id.noteField)).getText().toString(),
+                jsonArray,
+                null
+        );
 
-        return revise;
+
     }
 
     public AddIncomeFragment() {
@@ -112,10 +107,6 @@ public class AddIncomeFragment extends AbstractAddPage {
     }
     SharedPreferences sharedPreferences;
     boolean usingImages = false;
-
-    Event revise = null;
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -140,19 +131,7 @@ public class AddIncomeFragment extends AbstractAddPage {
 
             noteField.setText(sharedPreferences.getString("noteBox", ""));
         }else{
-            revise = Event.decodeFromString(args.getString("event"));
-
-            amountField.setText(String.valueOf(revise.moneyAmount));
-
-            noteField.setText(revise.noteData);
-            v.findViewById(R.id.addImg).setVisibility(View.GONE);
-
-            if (revise.variety == Event.EventVariety.Income)
-                setMode(0);
-            if (revise.variety == Event.EventVariety.Expense)
-                setMode(1);
-            if (revise.variety == Event.EventVariety.JobExpense)
-                setMode(2);
+            throw new RuntimeException();
         }
         noteField.setOnFocusChangeListener(focus);
 

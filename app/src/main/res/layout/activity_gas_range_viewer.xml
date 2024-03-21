@@ -76,32 +76,6 @@
 
         </LinearLayout>
     </ScrollView>
-    <Button
-        android:id="@+id/commitChanges"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:text="Save"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/revisionMenu"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/revisionMenu"
-        android:name="com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="65dp"
-        android:layout_marginBottom="50dp"
-        android:background="@color/white_maybe"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="invisible" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

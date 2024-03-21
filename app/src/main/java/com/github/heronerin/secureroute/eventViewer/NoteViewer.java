@@ -140,30 +140,6 @@ public class NoteViewer extends AppCompatActivity {
 
         if (event.cachedRanges.isEmpty())
             activity.findViewById(R.id.rangesTitle).setVisibility(View.GONE);
-
-        activity.findViewById(R.id.eventVirietyPreview).setOnClickListener((v)->{
-            try {
-                final AbstractAddPage fragment = (AbstractAddPage) fragmentCls.newInstance();
-
-                Bundle bundle = new Bundle();
-                bundle.putString("event", event.encodeAsString());
-                fragment.setArguments(bundle);
-
-                activity.findViewById(R.id.revisionMenu).setVisibility(View.VISIBLE);
-                activity.findViewById(R.id.commitChanges).setVisibility(View.VISIBLE);
-                activity.findViewById(R.id.noteViewScroll).setVisibility(View.GONE);
-                activity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.revisionMenu, fragment)
-                        .commit();
-
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            }
-
-        });
     }
 
     @SuppressLint("MissingInflatedId")
