@@ -3,7 +3,7 @@ This is very early **WIP** and is not meant to be used by **anybody**!!! It is t
 Light                      |  Dark
 :-------------------------:|:-------------------------:
 ![](screenshots/home.png)  |  ![](screenshots/home_dark.png)
-
+![](screenshots/gas.png)  |  ![](screenshots/gas_dark.png)
 
 ## Copyright
 
