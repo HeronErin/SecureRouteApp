@@ -2,24 +2,19 @@ package com.github.heronerin.secureroute.events;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-
-import androidx.annotation.NonNull;
 
 import com.github.heronerin.secureroute.DataBase;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class EventEditUtils {
@@ -137,7 +132,7 @@ public class EventEditUtils {
             return true;
         };
     }
-    public static void confirm(Runnable onConfirm, String title, String body, Context context){
+    public static void confirm(Runnable onConfirm, Runnable onCancel, String title, String body, Context context){
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
         alert.setTitle(title);
         TextView tv = new TextView(context);
@@ -146,10 +141,11 @@ public class EventEditUtils {
         alert.setView(tv);
 
         alert.setPositiveButton("Ok", (dialog, whichButton) -> onConfirm.run());
-        alert.setNegativeButton("Cancel", (dialog, whichButton) -> {});
+        alert.setNegativeButton("Cancel", (dialog, whichButton) -> onCancel.run());
 
         alert.show();
     }
+    public static void confirm(Runnable onConfirm, String title, String body, Context context){ confirm(onConfirm, ()->{}, title, body, context); }
     public static MenuItem.OnMenuItemClickListener deleteEvent(Context context, Event event){
         return item -> {
             confirm(()-> confirm(()->{
@@ -160,7 +156,7 @@ public class EventEditUtils {
             return true;
         };
     }
-    public static MenuItem.OnMenuItemClickListener transmuteVariety(Context context, Event event, List<Event.EventVariety> varietyList){
+    public static MenuItem.OnMenuItemClickListener transmuteVariety(Context context, Event event, Event.EventVariety[] varietyList){
 
         return item -> {
             if (event.odometer == null) return true;
@@ -169,19 +165,44 @@ public class EventEditUtils {
             alert.setTitle("Edit type");
             Spinner spinner = new Spinner(context);
             List<String> strings = new ArrayList<>();
-            
+            strings.add(event.variety.toString());
+
+            for (Event.EventVariety variety : varietyList)
+                if (!variety.toString().equals(event.variety.toString()))
+                    strings.add(variety.toString());
+
             ArrayAdapter<String> varietyAdaptor = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, strings);
             spinner.setAdapter(varietyAdaptor);
-
+            alert.setView(spinner);
 
             alert.setPositiveButton("Ok", (dialog, whichButton) -> {
-//                event.odometer = Long.valueOf(editText.getText().toString());
-//                DataBase.getOrCreate(context).updateEvent(event);
+                String selected = strings.get(spinner.getSelectedItemPosition());
+                event.variety = Event.EventVariety.valueOf(selected);
+
+                DataBase.getOrCreate(context).updateEvent(event);
             });
             alert.setNegativeButton("Cancel", (dialog, whichButton) -> {});
 
             alert.show();
             return true;
         };
+    }
+    public static MenuItem.OnMenuItemClickListener transmuteMonetaryAmount(Context context, Event event){
+        return transmuteVariety(
+                context,
+                event,
+                new Event.EventVariety[]{
+                        Event.EventVariety.Income,
+                        Event.EventVariety.Expense,
+                        Event.EventVariety.JobExpense
+                }
+        );
+    }
+    public static MenuItem.OnMenuItemClickListener transmute(Context context, Event event){
+        return transmuteVariety(
+                context,
+                event,
+                Event.EventVariety.values()
+        );
     }
 }

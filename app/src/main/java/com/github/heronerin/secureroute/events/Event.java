@@ -3,12 +3,11 @@ package com.github.heronerin.secureroute.events;
 import static com.github.heronerin.secureroute.events.Event.EventVariety.*;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.util.Pair;
 import android.view.ContextMenu;
-import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.DataBase;
@@ -320,15 +319,21 @@ public class Event implements Serializable {
     }
 
     public void handleContext(Context context, ContextMenu menu) {
+        SharedPreferences settings = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        boolean isGod = settings.getBoolean("godTransmute", false);
 
 //        menu.add("asd").setOnMenuItemClickListener()
         menu.add("Edit time").setOnMenuItemClickListener(EventEditUtils.editTime(context, this));
+        if (variety == Income || variety == JobExpense || variety == Expense)
+            menu.add("Change type").setOnMenuItemClickListener(EventEditUtils.transmuteMonetaryAmount(context, this));
         if (variety == GasEvent || variety == Income || variety == JobExpense || variety == Expense)
             menu.add("Edit money amount").setOnMenuItemClickListener(EventEditUtils.editMoney(context, this));
         if (variety == GasEvent || variety == TripStart || variety == TripEnd)
             menu.add("Edit odometer").setOnMenuItemClickListener(EventEditUtils.editOdometer(context, this));
         if (variety == ArbitraryNote || variety == Income || variety == JobExpense || variety == Expense || variety == GasEvent || variety == TripStart || variety == TripEnd || isRangeStart(variety))
             menu.add("Edit note").setOnMenuItemClickListener(EventEditUtils.editNote(context, this));
+        if (isGod)
+            menu.add("God transmute").setOnMenuItemClickListener(EventEditUtils.transmute(context, this));
 
         menu.add("Delete event").setOnMenuItemClickListener(EventEditUtils.deleteEvent(context, this));
 
