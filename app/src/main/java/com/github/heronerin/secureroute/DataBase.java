@@ -168,6 +168,17 @@ public class DataBase extends SQLiteOpenHelper {
             }
         }
     }
+    public synchronized void deleteEvent(Event event){
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            db.delete("events", "id = ?", new String[]{String.valueOf(event.databaseId)});
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
     public synchronized void updateEvent(Event event) {
         SQLiteDatabase db = null;
         try {
@@ -256,6 +267,6 @@ public class DataBase extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Implementation for database upgrades if needed
-        db.execSQL("DROP TABLE events");
+
     }
 }

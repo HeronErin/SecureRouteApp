@@ -327,8 +327,10 @@ public class Event implements Serializable {
             menu.add("Edit money amount").setOnMenuItemClickListener(EventEditUtils.editMoney(context, this));
         if (variety == GasEvent || variety == TripStart || variety == TripEnd)
             menu.add("Edit odometer").setOnMenuItemClickListener(EventEditUtils.editOdometer(context, this));
-        if (variety == ArbitraryNote)
+        if (variety == ArbitraryNote || variety == Income || variety == JobExpense || variety == Expense || variety == GasEvent || variety == TripStart || variety == TripEnd || isRangeStart(variety))
             menu.add("Edit note").setOnMenuItemClickListener(EventEditUtils.editNote(context, this));
+
+        menu.add("Delete event").setOnMenuItemClickListener(EventEditUtils.deleteEvent(context, this));
 
     }
 

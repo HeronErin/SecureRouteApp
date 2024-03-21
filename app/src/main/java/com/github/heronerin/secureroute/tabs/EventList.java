@@ -1,6 +1,8 @@
 package com.github.heronerin.secureroute.tabs;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -28,10 +30,12 @@ public class EventList extends Fragment {
         EventList fragment = new EventList();
         return fragment;
     }
-
+    private SharedPreferences settings;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
 
         DataBase db = DataBase.getOrCreate(this.getContext());
 
@@ -42,7 +46,7 @@ public class EventList extends Fragment {
 
         List<Event> filteredEventList = new ArrayList<>();
         for (Event event : eventList)
-            if (!Event.isRangeEnd(event.variety))
+            if (!event.isRangeEnd(event.variety) || settings.getBoolean("showEnd", false))
                 filteredEventList.add(event);
 
         eventArrayAdapter = new EventArrayAdapter(

@@ -26,6 +26,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.github.heronerin.secureroute.events.Event;
+import com.github.heronerin.secureroute.events.EventEditUtils;
 import com.github.heronerin.secureroute.tabs.AddFragment;
 import com.github.heronerin.secureroute.tabs.EventList;
 import com.github.heronerin.secureroute.tabs.SettingsFragment;
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             CameraManager.instance.activity = this;
 
         updateNotification(this);
-//        Log.w("GotFromDb", String.valueOf(DataBase.instance.getLastWithOdometer().odometer));
+
     }
 
 

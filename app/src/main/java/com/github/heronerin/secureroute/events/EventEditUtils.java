@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
@@ -129,6 +130,29 @@ public class EventEditUtils {
 
             alert.show();
 
+            return true;
+        };
+    }
+    public static void confirm(Runnable onConfirm, String title, String body, Context context){
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(title);
+        TextView tv = new TextView(context);
+        tv.setText(body);
+        tv.setPadding(20, 20, 20, 20);
+        alert.setView(tv);
+
+        alert.setPositiveButton("Ok", (dialog, whichButton) -> onConfirm.run());
+        alert.setNegativeButton("Cancel", (dialog, whichButton) -> {});
+
+        alert.show();
+    }
+    public static MenuItem.OnMenuItemClickListener deleteEvent(Context context, Event event){
+        return item -> {
+            confirm(()-> confirm(()->{
+                DataBase db = DataBase.getOrCreate(context);
+                db.deleteEvent(event);
+            }, "Are truly you sure?", "This actually can't be undone!", context),
+                    "Are you sure?", "Deleting an event is something that can't be undone!", context);
             return true;
         };
     }
