@@ -22,9 +22,10 @@ jobs:
         
     - name: Install Android SDK
       uses: android-actions/setup-android@v2
-      with:
-        android-sdk-root: ${{ github.workspace }}/android-sdk
-        build-tools-version: 29.0.3
+      
+    - name: Install Build Tools
+      run: |
+        echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "build-tools;29.0.3" --channel=3
         
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
