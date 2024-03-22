@@ -19,7 +19,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-
+        
+    - name: Install Android SDK
+      uses: android-actions/setup-android@v2
+      with:
+        android-sdk-root: ${{ github.workspace }}/android-sdk
+        build-tools-version: 29.0.3
+        
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
