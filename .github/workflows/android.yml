@@ -41,7 +41,7 @@ jobs:
         RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: |
         ./gradlew assembleRelease --stacktrace
-        ./gradlew signRelease --stacktrace
+        ./gradlew signReleaseBundle --stacktrace
       
     - name: Get signed release file APK path
       id: signedReleaseApk
@@ -51,4 +51,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: signed-release-apk
-        path: ${{ steps.signedReleaseApk.outputs.signedApkfile }}
+        # path: ${{ steps.signedReleaseApk.outputs.signedApkfile }}
+        path: app/build
