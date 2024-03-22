@@ -85,7 +85,7 @@ public class StatsFragment extends Fragment {
             xAxis.setGranularity(max / 4F);
             xAxis.setAxisMaximum(max * 1.2f);
         }
-        
+
         xAxis.setAxisMinimum(0);
 
 
