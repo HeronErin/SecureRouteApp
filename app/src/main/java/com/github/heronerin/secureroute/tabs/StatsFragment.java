@@ -81,10 +81,13 @@ public class StatsFragment extends Fragment {
                 new SimpleDateFormat("HH:mm:ss MM/dd/yyyy").format(new Date(deFloatifyTime(value) + finalMin))
         );
 
-        if (max != null)
+        if (max != null) {
             xAxis.setGranularity(max / 4F);
+            xAxis.setAxisMaximum(max * 1.2f);
+        }
+        
         xAxis.setAxisMinimum(0);
-        xAxis.setAxisMaximum(max * 1.2f);
+
 
         chart.setData(new LineData(dataSet));
     }
