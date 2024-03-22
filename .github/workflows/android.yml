@@ -10,20 +10,20 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checking out branch
       uses: actions/checkout@v3
-      
+
     - name: Setup Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: 17
-        
+
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2.0.10
-      
+
     - name: Decode Keystore
       env:
         ENCODED_STRING: ${{ secrets.SIGNING_KEY }}
@@ -33,23 +33,23 @@ jobs:
       run: |
         echo $ENCODED_STRING > keystore-b64.txt
         base64 -d keystore-b64.txt > keystore.jks
-        
-    - name: Build and Sign Release APK
+
+    - name: Build Release APK
+      run: ./gradlew assembleRelease --stacktrace
+
+    - name: Sign Release APK
       env:
         RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         RELEASE_KEYSTORE_ALIAS: key0
         RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      run: |
-        ./gradlew assembleRelease --stacktrace
-        ./gradlew signReleaseBundle --stacktrace
-      
+      run: ./gradlew app:signingReport --stacktrace
+
     - name: Get signed release file APK path
       id: signedReleaseApk
       run: echo "signedApkfile=$(find app/build/outputs/apk/release/*.apk | grep -v 'unsigned')" >> $GITHUB_OUTPUT
-      
+
     - name: Upload Signed Release APK to Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: signed-release-apk
-        # path: ${{ steps.signedReleaseApk.outputs.signedApkfile }}
-        path: app/build
+        path: ${{ steps.signedReleaseApk.outputs.signedApkfile }}
