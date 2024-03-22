@@ -32,10 +32,12 @@ jobs:
         RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: |
         echo $ENCODED_STRING > keystore-b64.txt
-        base64 -d keystore-b64.txt > keystore.jks
+        base64 -d keystore-b64.txt > android_key.jks
 
     - name: Build Release APK
-      run: ./gradlew assembleRelease --stacktrace
+      run: |
+        export S_PASSWORD=${{ secrets.KEY_PASSWORD }}
+        ./gradlew assembleRelease --stacktrace
 
     - name: Sign Release APK
       env:
