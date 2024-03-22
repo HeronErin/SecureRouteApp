@@ -18,12 +18,22 @@ import com.github.heronerin.secureroute.TripUtils;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class GasRangeViewer extends AppCompatActivity {
+//    public static final double mileDeduction = 0.67D;
+    public static double mileDeduction(long timestamp){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timestamp);
+        if (c.get(Calendar.YEAR) == 2023)
+            return 65.5D / 100D;
+        return 67D / 100D;
+    }
 
     Event event;
     Event endEvent = null;
+    Event eventFollowing = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,26 +61,39 @@ public class GasRangeViewer extends AppCompatActivity {
             info+="\nStill ongoing";
         else{
             endEvent = DataBase.getOrCreate(this).getEventById(event.associatedPair);
-            info+="\nEnding odometer: "+endEvent.odometer;
-            info+="\nMiles traveled: " + (endEvent.odometer - event.odometer);
-            info+="\nTime between fillups: " + TripUtils.formatMillisecondsToTime(endEvent.timeStamp - event.timeStamp);
-            end = endEvent.timeStamp;
+            if (endEvent != null) {
+                eventFollowing = DataBase.instance.getEventAfterTimeOfType(Event.EventVariety.GasEvent, endEvent.timeStamp);
+
+                info += "\nEnding odometer: " + endEvent.odometer;
+                info += "\nMiles traveled: " + (endEvent.odometer - event.odometer);
+                info += "\nTime between fillups: " + TripUtils.formatMillisecondsToTime(endEvent.timeStamp - event.timeStamp);
+                end = endEvent.timeStamp;
+            }
         }
         List<Event> containing = DataBase.getOrCreate(this).getInTimeFrame(event.timeStamp, end);
         event.cachedRanges = containing;
         long businessMiles = 0;
         for (Event event2 : containing){
-            if (event2.variety == Event.EventVariety.TripEnd){
-                Event event3 = DataBase.instance.getEventById(event2.associatedPair);
-                if (event3 == null) continue;
-                if (event3.timeStamp > end || event3.timeStamp < event.timeStamp) continue;
+            if (event2.variety != Event.EventVariety.TripEnd) continue;
 
-                businessMiles+=event2.odometer-event3.odometer;
-            }
+            Event event3 = DataBase.instance.getEventById(event2.associatedPair);
+
+            if (event3 == null) continue;
+            if (event3.timeStamp > end || event3.timeStamp < event.timeStamp) continue;
+
+            businessMiles+=event2.odometer-event3.odometer;
+
         }
         info+="\nBusiness Miles: " + businessMiles;
+        info+="\nBusiness Mile Deductions: " + (Double.valueOf(businessMiles) * mileDeduction(event.timeStamp));
+        Double buisnessPercent = null;
         if (endEvent != null)
-            info+="\nBusiness usage: " +(Double.valueOf(businessMiles) / Double.valueOf(endEvent.odometer - event.odometer) * 100) + "%";
+            info+="\n\nBusiness usage: " +((buisnessPercent = (Double.valueOf(businessMiles) / Double.valueOf(endEvent.odometer - event.odometer))) * 100) + "%";
+        if (eventFollowing != null){
+            info += "\nGas event cost following: " + eventFollowing.moneyAmount;
+            if (buisnessPercent != null)
+                info += "\nNext gas event deduction: " + (eventFollowing.moneyAmount * buisnessPercent);
+        }
 
         tripInfo.setText(info);
 

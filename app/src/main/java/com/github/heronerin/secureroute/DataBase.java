@@ -91,6 +91,28 @@ public class DataBase extends SQLiteOpenHelper {
             return null;
         return events.get(0);
     }
+    public List<Event> getEventsOfVariety(Event.EventVariety[] varieties, int limit){
+        List<String> varietiesStrings = new ArrayList<>();
+        for (Event.EventVariety variety : varieties)
+            varietiesStrings.add(variety.toString());
+        return eventsBySql(
+                "SELECT * FROM events WHERE variety in ("+StringPlaceHolderGen(varietiesStrings.size())+") ORDER BY timestamp DESC",
+                varietiesStrings.toArray(new String[]{}),
+                limit
+        );
+    }
+    public Event getEventAfterTimeOfType(Event.EventVariety variety, long timestamp){
+        List<Event> events = eventsBySql(
+                "SELECT * FROM events WHERE (variety = ? AND timestamp > ?) ORDER BY timestamp ASC LIMIT 1",
+                new String[]{
+                        variety.toString(),
+                        String.valueOf(timestamp)
+                }, Integer.MAX_VALUE
+        );
+        if (events.isEmpty())
+            return null;
+        return events.get(0);
+    }
     @Nullable
     public Event getEventById(int id){
         List<Event> events = eventsBySql(
