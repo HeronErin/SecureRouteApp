@@ -1,5 +1,5 @@
 name: Android CI
-
+# Taken from https://medium.com/@dcostalloyd90/automating-android-builds-with-github-actions-a-step-by-step-guide-2a02a54f59cd
 on:
   push:
     branches: [ "main" ]
@@ -66,7 +66,8 @@ jobs:
           dest: ${{ steps.releaseApk.outputs.apkfile }}.zip
 
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload Release Build to Artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: generatedPrelease
-          path: ${{ steps.releaseApk.outputs.apkfile }}
+           name: release-artifacts
+           path: ${{ steps.releaseApk.outputs.apkfile }}
