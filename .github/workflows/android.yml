@@ -12,42 +12,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: 17
-        distribution: 'adopt'
+      - name: Checking out branch
+        uses: actions/checkout@v3
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
 
-    - name: Install Build Tools
-      run: |
-        sudo apt-get install -y libxml2-utils
-        echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "build-tools;29.0.3" --channel=3
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2.0.10
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      # This will decode the keystore from base 64 text representation that we have stored in secrets
+      # and generates and keystore file and gets stored in /android-app path
+      - name: Decode Keystore
+        env:
+          ENCODED_STRING: ${{ secrets.SIGNING_KEY }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          RELEASE_KEYSTORE_ALIAS: key0
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-    - name: Build with Gradle
-      run: ./gradlew build
+        run: |
+          echo $ENCODED_STRING > keystore-b64.txt
+          base64 -d keystore-b64.txt > keystore.jks
 
-    - uses: upup-company/apksigner-android@v1
-      name: Sign app APK
-      id: sign_app
-      with:
-        releaseDirectory: app/build/outputs/apk/release
-        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-        alias: key0
-        keyStorePassword: ${{ secrets.KEY_PASSWORD }}
-        keyPassword: ${{ secrets.KEY_PASSWORD }}
-        customArgs: |
-          --v1-signing-enabled,true
-          --v2-signing-enabled,true
+      - name: Build Release apk
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          RELEASE_KEYSTORE_ALIAS: key0
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease --stacktrace
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: apks_generated
-        path: ./app/build/outputs/apk
+      - name: Build Release bundle
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          RELEASE_KEYSTORE_ALIAS: key0
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew bundleRelease --stacktrace
+
+      - name: Get release file aab path
+        id: releaseAab
+        run: echo "aabfile=$(find app/build/outputs/bundle/release/*.aab)" >> $GITHUB_OUTPUT
+
+      - name: Get release file apk path
+        id: releaseApk
+        run: echo "apkfile=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
+
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apks_generated
+          path: ./app/build/outputs/apk
