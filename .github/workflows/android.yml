@@ -58,9 +58,15 @@ jobs:
       - name: Get release file apk path
         id: releaseApk
         run: echo "apkfile=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
+        
+      - name: Zip Files
+        uses: papeloto/action-zip@v1
+        with:
+          files: ${{ steps.releaseAab.outputs.aabfile }} ${{ steps.releaseApk.outputs.apkfile }}
+          dest: ${{ steps.releaseApk.outputs.apkfile }}.zip
 
 
       - uses: actions/upload-artifact@v4
         with:
-          name: apks_generated
-          path: ./app/build/outputs/apk
+          name: generatedPrelease
+          path: ${{ steps.releaseApk.outputs.apkfile }}.zip
