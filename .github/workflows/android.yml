@@ -13,26 +13,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: set up JDK 17
+    
+    - name: Set up JDK
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
-        
-    - name: Install Android SDK
+        java-version: 17
+        distribution: 'adopt'
+
+    - name: Setup Android SDK
       uses: android-actions/setup-android@v2
-      
+
     - name: Install Build Tools
       run: |
         echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "build-tools;29.0.3" --channel=3
-        
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
+
     - name: Build with Gradle
       run: ./gradlew build
-      
+
     - uses: upup-company/apksigner-android@v1
       name: Sign app APK
       id: sign_app
@@ -42,7 +42,9 @@ jobs:
         alias: key0
         keyStorePassword: ${{ secrets.KEY_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
-        customArgs: --v1-signing-enabled,true,--v2-signing-enabled,true
+        customArgs: |
+          --v1-signing-enabled,true
+          --v2-signing-enabled,true
 
     - uses: actions/upload-artifact@v4
       with:
