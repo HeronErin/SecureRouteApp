@@ -25,6 +25,7 @@ jobs:
 
     - name: Install Build Tools
       run: |
+        sudo apt-get install -y libxml2-utils
         echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "build-tools;29.0.3" --channel=3
 
     - name: Grant execute permission for gradlew
