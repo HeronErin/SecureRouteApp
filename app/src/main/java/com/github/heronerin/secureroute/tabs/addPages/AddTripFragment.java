@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.github.heronerin.secureroute.CameraManager;
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;

@@ -1,6 +1,8 @@
 package com.github.heronerin.secureroute.tabs.addPages;
 
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -14,11 +16,12 @@ import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 
-import com.github.heronerin.secureroute.CameraManager;
+import com.github.heronerin.secureroute.ImageManager;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.File;
 import java.util.UUID;
@@ -35,17 +38,11 @@ public class AddIncomeFragment extends AbstractAddPage {
         SharedPreferences.Editor e = sharedPreferences.edit();
         e.putString("noteBox", "");
         e.putString("addAmount", "");
-        e.apply();
-
-        ((EditText)getActivity().findViewById(R.id.noteField)).setText("");
         if (usingImages){
-            String path = CameraManager.instance.getTempPath();
-            if (path.startsWith("file:/")) path=path.substring("file:/".length());
-
-            File f = new File(path);
-            if (f.exists()) f.delete();
+            e.putString("lastImg", "[]");
             usingImages = false;
         }
+        e.apply();
     }
 
     int isIncome = 0;
@@ -75,7 +72,9 @@ public class AddIncomeFragment extends AbstractAddPage {
     public Event genValidEvent() {
         JSONArray jsonArray = new JSONArray();
         if (usingImages){
-            jsonArray = CameraManager.instance.getTempJsonArray();
+            try {
+                jsonArray = new JSONArray(sharedPreferences.getString("lastImg", "[]"));
+            } catch (JSONException e) { }
         }
         EditText amountField = getActivity().findViewById(R.id.addAmount);
 
@@ -136,10 +135,11 @@ public class AddIncomeFragment extends AbstractAddPage {
         noteField.setOnFocusChangeListener(focus);
 
 
-        assert CameraManager.instance != null;
         v.findViewById(R.id.addImg).setOnClickListener((view)-> {
             usingImages=true;
-            CameraManager.instance.openTemp(() -> usingImages = true);
+            Intent intent = new Intent(this.getContext(), ImageManager.class);
+            intent.putExtra("json", sharedPreferences.getString("lastImg", "[]"));
+            startActivityForResult(intent, 69);
         });
 
 
@@ -149,7 +149,13 @@ public class AddIncomeFragment extends AbstractAddPage {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode != 69 || resultCode != RESULT_OK || data == null) return;
 
+        SharedPreferences.Editor e = sharedPreferences.edit();
+        String jso = data.getStringExtra("json");
+        if (jso != null)
+            e.putString("lastImg", jso);
+        e.apply();
     }
 
 

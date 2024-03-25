@@ -1,17 +1,12 @@
 package com.github.heronerin.secureroute;
 
-import static com.github.heronerin.secureroute.TripUtils.startTrip;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.FragmentTransaction;
-import android.app.Notification;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.Manifest;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -26,12 +21,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.github.heronerin.secureroute.events.Event;
-import com.github.heronerin.secureroute.events.EventEditUtils;
 import com.github.heronerin.secureroute.tabs.AddFragment;
 import com.github.heronerin.secureroute.tabs.EventList;
 import com.github.heronerin.secureroute.tabs.SettingsFragment;
 import com.github.heronerin.secureroute.tabs.StatsFragment;
-import com.github.heronerin.secureroute.tabs.UploadFragment;
+import com.github.heronerin.secureroute.tabs.SaveFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             StatsFragment.newInstance(),
             AddFragment.newInstance(),
             SettingsFragment.newInstance(),
-            UploadFragment.newInstance(),
+            SaveFragment.newInstance(),
 
     };
     int currentTab = 0;
@@ -114,11 +108,6 @@ public class MainActivity extends AppCompatActivity {
         for (int btn : btns)
             findViewById(btn).setOnClickListener(this::onTabClick);
         findViewById(btns[0]).callOnClick();
-
-        if (CameraManager.instance == null)
-            CameraManager.instance = new CameraManager(this);
-        else
-            CameraManager.instance.activity = this;
 
         updateNotification(this);
 

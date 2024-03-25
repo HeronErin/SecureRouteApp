@@ -26,7 +26,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.github.heronerin.secureroute.DataBase;
-import com.github.heronerin.secureroute.ImageViewerFragment;
+import com.github.heronerin.secureroute.ImageManager;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.events.EventArrayAdapter;
@@ -40,12 +40,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NoteViewer extends AppCompatActivity {
-    static class ImageAdaptor extends ArrayAdapter<ImageViewerFragment.ImgTitleCombo> {
+    static class ImageAdaptor extends ArrayAdapter<ImageManager.ImgTitleCombo> {
 
         private Context mContext;
-        private List<ImageViewerFragment.ImgTitleCombo> imageComboList = new ArrayList<>();
+        private List<ImageManager.ImgTitleCombo> imageComboList = new ArrayList<>();
 
-        public ImageAdaptor(@NonNull Context context, List<ImageViewerFragment.ImgTitleCombo> list) {
+        public ImageAdaptor(@NonNull Context context, List<ImageManager.ImgTitleCombo> list) {
             super(context, 0 , list);
             mContext = context;
             imageComboList = list;
@@ -58,7 +58,7 @@ public class NoteViewer extends AppCompatActivity {
             View listItem = convertView;
             if(listItem == null)
                 listItem = LayoutInflater.from(mContext).inflate(R.layout.photo_list_item,parent,false);
-            ImageViewerFragment.ImgTitleCombo combo = imageComboList.get(position);
+            ImageManager.ImgTitleCombo combo = imageComboList.get(position);
 
             final Uri imageUri = Uri.parse(combo.img);
             ImageView image = (ImageView)listItem.findViewById(R.id.imgPreview);
@@ -111,7 +111,7 @@ public class NoteViewer extends AppCompatActivity {
         ((ImageView)activity.findViewById(R.id.eventVirietyPreview)).setImageResource(event.getIcon());
 
         ((TextView)activity.findViewById(R.id.noteData)).setText(event.noteData);
-        List<ImageViewerFragment.ImgTitleCombo> imageComboList = new ArrayList<>();
+        List<ImageManager.ImgTitleCombo> imageComboList = new ArrayList<>();
         ImageAdaptor imageAdaptor = new ImageAdaptor(activity, imageComboList);
 
         JSONArray jsonImgs = event.getImageData();
@@ -122,7 +122,7 @@ public class NoteViewer extends AppCompatActivity {
         try {
             for (int i = 0; i < jsonImgs.length(); i++){
                 JSONArray img = jsonImgs.getJSONArray(i);
-                imageAdaptor.add(new ImageViewerFragment.ImgTitleCombo(img.getString(0), img.getString(1)));
+                imageAdaptor.add(new ImageManager.ImgTitleCombo(img.getString(0), img.getString(1)));
             }
         } catch (JSONException e) {
             throw new RuntimeException(e);

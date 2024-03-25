@@ -14,7 +14,11 @@ import com.github.heronerin.secureroute.events.Event;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,23 +32,11 @@ public class DataBase extends SQLiteOpenHelper {
         return instance;
     }
     URI databaseUri;
-    URI picturesUri;
-    File events;
-
     private static final String DB_NAME = "SecureRouteDB";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
     DataBase(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        File filesDir = context.getFilesDir();
-        databaseUri = filesDir.toURI().resolve("database");
-        picturesUri = databaseUri.resolve("pictures");
-        events = new File(databaseUri.resolve("events"));
-
-        new File(databaseUri).mkdirs();
-        new File(picturesUri).mkdirs();
-        events.mkdirs();
-
     }
 
     @Override
@@ -59,6 +51,9 @@ public class DataBase extends SQLiteOpenHelper {
                 "odometer BIGINT," +
                 "note_data TEXT," +
                 "image_uri TEXT);");
+        db.execSQL("CREATE TABLE images (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "uri TEXT);");
     }
 
     @Nullable
@@ -190,6 +185,19 @@ public class DataBase extends SQLiteOpenHelper {
             }
         }
     }
+    public synchronized boolean writeDBToFile(Context context, OutputStream outputStream){
+        File DBPath = context.getDatabasePath(getDatabaseName());
+        if (!DBPath.exists()) return false;
+
+        try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(DBPath))){
+            byte[] bytes = new byte[1024*10];
+            while(-1 != bufferedInputStream.read(bytes)){
+                outputStream.write(bytes);
+            }
+            return true;
+        }catch (IOException ignored){}
+        return false;
+    }
     public synchronized void deleteEvent(Event event){
         SQLiteDatabase db = null;
         try {
@@ -288,7 +296,14 @@ public class DataBase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Implementation for database upgrades if needed
+
+
+
+        if (oldVersion == 2 && newVersion == 3)
+            db.execSQL("CREATE TABLE images (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "uri TEXT);");
+
 
     }
 }

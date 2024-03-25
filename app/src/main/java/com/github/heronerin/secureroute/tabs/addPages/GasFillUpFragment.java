@@ -1,6 +1,9 @@
 package com.github.heronerin.secureroute.tabs.addPages;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -9,12 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.github.heronerin.secureroute.CameraManager;
+import androidx.annotation.Nullable;
+
 import com.github.heronerin.secureroute.DataBase;
+import com.github.heronerin.secureroute.ImageManager;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -66,13 +72,25 @@ public class GasFillUpFragment extends AbstractAddPage {
         };
         noteField.setOnFocusChangeListener(focusChangeListener);
 
-        assert CameraManager.instance != null;
+
         v.findViewById(R.id.addImg).setOnClickListener((view)-> {
             usingImages=true;
-            CameraManager.instance.openTemp(() -> usingImages = true);
+            Intent intent = new Intent(this.getContext(), ImageManager.class);
+            intent.putExtra("json", sharedPreferences.getString("lastImg", "[]"));
+            startActivityForResult(intent, 69);
         });
 
         return v;
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode != 69 || resultCode != RESULT_OK || data == null) return;
+
+        SharedPreferences.Editor e = sharedPreferences.edit();
+        String jso = data.getStringExtra("json");
+        if (jso != null)
+            e.putString("lastImg", jso);
+        e.apply();
     }
 
     @Override
@@ -90,8 +108,11 @@ public class GasFillUpFragment extends AbstractAddPage {
     public Event genValidEvent() {
         JSONArray jsonArray = new JSONArray();
         if (usingImages){
-            jsonArray = CameraManager.instance.getTempJsonArray();
+            try {
+                jsonArray = new JSONArray(sharedPreferences.getString("lastImg", "[]"));
+            } catch (JSONException e) { }
         }
+
 
         return new Event(
                 Event.EventVariety.GasEvent,
@@ -107,7 +128,16 @@ public class GasFillUpFragment extends AbstractAddPage {
 
     @Override
     public void clearStorage() {
-
+        SharedPreferences.Editor e = sharedPreferences.edit();
+        e.putString("noteBox", "");
+        e.putString("gasFillupCost", "");
+        if (usingImages){
+            e.putString("lastImg", "[]");
+            usingImages=false;
+        }
+        e.apply();
+        ((EditText)getActivity().findViewById(R.id.noteField)).setText("");
+        ((EditText)getActivity().findViewById(R.id.gasFillupCost)).setText("");
     }
 
     @Override
