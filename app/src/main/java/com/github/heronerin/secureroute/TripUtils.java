@@ -10,6 +10,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.Duration;
 
 public class TripUtils {
@@ -73,6 +76,15 @@ public class TripUtils {
         sb.append(seconds).append(" second").append(seconds > 1 ? "s" : "");
 
         return sb.toString();
+    }
+
+
+    public static void copy(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[512*1024];
+        int len;
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
+        }
     }
 
 }

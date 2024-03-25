@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.Manifest;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -108,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
         for (int btn : btns)
             findViewById(btn).setOnClickListener(this::onTabClick);
         findViewById(btns[0]).callOnClick();
+
+        Log.d("LISToJumk", DataBase.getOrCreate(this).getAllImageUris().toString());
 
         updateNotification(this);
 

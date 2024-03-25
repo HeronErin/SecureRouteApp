@@ -15,9 +15,11 @@ import android.widget.Toast;
 
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.TripUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -56,6 +58,15 @@ public class SaveFragment extends Fragment {
                 return;
             }
             out.putNextEntry(new ZipEntry("images/"));
+            for (String uri : DataBase.getOrCreate(this.getContext()).getAllImageUris()){
+                String[] split = uri.split("/");
+                String number = split[split.length-1];
+                out.putNextEntry(new ZipEntry("images/" + number));
+
+                try(InputStream inputStream = getContext().getContentResolver().openInputStream(Uri.parse(uri))){
+                    TripUtils.copy(inputStream, out);
+                }
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -212,10 +212,7 @@ public class ImageManager extends AppCompatActivity {
 
                 try (InputStream is = new BufferedInputStream(getContentResolver().openInputStream(data.getData()))) {
                     try (OutputStream os = new BufferedOutputStream(getContentResolver().openOutputStream(lastPhotoUri))) {
-                        byte[] bytes = new byte[1024];
-                        while (-1 != is.read(bytes)) {
-                            os.write(bytes);
-                        }
+                        TripUtils.copy(is, os);
                         os.flush();
                     }
 

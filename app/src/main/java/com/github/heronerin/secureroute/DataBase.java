@@ -53,7 +53,7 @@ public class DataBase extends SQLiteOpenHelper {
                 "image_uri TEXT);");
         db.execSQL("CREATE TABLE images (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "uri TEXT);");
+                "uri TEXT UNIQUE);");
     }
 
     @Nullable
@@ -171,13 +171,23 @@ public class DataBase extends SQLiteOpenHelper {
             if (event.noteData != null)
                 values.put("note_data", event.noteData);
 
-            if (event.getImageData() != null)
-                values.put("image_uri", event.getImageData().toString());
+            if (event.getImageData() != null) {
+                JSONArray images = event.getImageData();
+                values.put("image_uri", images.toString());
+
+                try {
+                    for (int i = 0; i < images.length(); i++) {
+                        String uri = images.getJSONArray(i).getString(0);
+                        ContentValues image_values = new ContentValues();
+                        image_values.put("uri", uri);
+                        db.insert("images", null, image_values);
+
+                    }
+                }catch (JSONException ignored) { }
+            }
 
             long id = db.insert("events", null, values);
             customEventSaveHandler(event, id, db);
-            Log.e("Addevent", String.valueOf(id));
-            Log.e("Addevent", event.variety.toString());
 
         } finally {
             if (db != null) {
@@ -190,12 +200,9 @@ public class DataBase extends SQLiteOpenHelper {
         if (!DBPath.exists()) return false;
 
         try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(DBPath))){
-            byte[] bytes = new byte[1024*10];
-            while(-1 != bufferedInputStream.read(bytes)){
-                outputStream.write(bytes);
-            }
+            TripUtils.copy(bufferedInputStream, outputStream);
             return true;
-        }catch (IOException ignored){}
+        }catch (IOException ignored){ }
         return false;
     }
     public synchronized void deleteEvent(Event event){
@@ -253,6 +260,18 @@ public class DataBase extends SQLiteOpenHelper {
         event.databaseId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
         return event;
     }
+    public synchronized List<String> getAllImageUris(){
+        List<String> strings = new ArrayList<>();
+        try(SQLiteDatabase db = this.getReadableDatabase()){
+            try(Cursor cursor = db.rawQuery("SELECT uri from images", null)) {
+                if (!cursor.moveToFirst()) return strings;
+                do {
+                    strings.add(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+        }
+        return strings;
+    }
 
     private List<Event> eventsBySql(String sql, @Nullable String[] args, int limit){
         List<Event> recentEvents = new ArrayList<>();
@@ -302,7 +321,7 @@ public class DataBase extends SQLiteOpenHelper {
         if (oldVersion == 2 && newVersion == 3)
             db.execSQL("CREATE TABLE images (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "uri TEXT);");
+                    "uri TEXT UNIQUE);");
 
 
     }
