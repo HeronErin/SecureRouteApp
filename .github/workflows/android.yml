@@ -32,7 +32,7 @@ jobs:
         RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: |
         echo $ENCODED_STRING > keystore-b64.txt
-        base64 -d keystore-b64.txt > android_key.jks
+        base64 -d keystore-b64.txt > app/android_key.jks
 
     - name: Build Release APK
       run: |
