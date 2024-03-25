@@ -4,7 +4,7 @@ This is very early **WIP** and is NOT stable. You may lose your database at **AN
 Light                      |  Dark
 :-------------------------:|:-------------------------:
 ![](screenshots/home.png)  |  ![](screenshots/home_dark.png)
-![](screenshots/gas.png)  |  ![](screenshots/gas_dark.png)
+![](screenshots/gas_dark.png)  |  ![](screenshots/gas.png)
 
 ## Copyright
 
