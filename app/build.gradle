@@ -18,9 +18,9 @@ android {
     signingConfigs {
         release {
             storeFile file("android_key.jks")
-            storePassword (System.getenv("S_PASSWORD") ?: file('../signing_password.txt').getText('UTF-8').trim())
+            storePassword file('../signing_password.txt').getText('UTF-8').trim()
             keyAlias 'key0'
-            keyPassword (System.getenv("S_PASSWORD") ?: file('../signing_password.txt').getText('UTF-8').trim())
+            keyPassword file('../signing_password.txt').getText('UTF-8').trim()
         }
     }
 
@@ -68,7 +68,6 @@ dependencies {
     implementation libs.material.v190
     implementation libs.commons.codec
 
-//    implementation libs.persistent.cookie.jar.okhttp
-//    implementation libs.PersistentCookieJar
+    implementation 'com.google.android.gms:play-services-drive:17.0.0'
     implementation 'com.github.AppDevNext:AndroidChart:3.1.0.21'
 }
