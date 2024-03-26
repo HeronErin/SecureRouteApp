@@ -1,7 +1,9 @@
 package com.github.heronerin.secureroute.tabs;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -12,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.heronerin.secureroute.DataBase;
@@ -22,6 +25,7 @@ import com.github.heronerin.secureroute.events.EventEditUtils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -78,6 +82,11 @@ public class SaveFragment extends Fragment {
 
         view.findViewById(R.id.exportDB).setOnClickListener(this::onExportDBButtonClick);
         view.findViewById(R.id.importDB).setOnClickListener(this::onImportDBButtonClick);
+        SharedPreferences sp = getContext().getSharedPreferences("info", Context.MODE_PRIVATE);
+
+        String lastEdit = "Last edited at: " + (new Date(sp.getLong("last edited", 0))).toString();
+        ((TextView)view.findViewById(R.id.lastSaved)).setText(lastEdit);
+
         return view;
     }
     @Override

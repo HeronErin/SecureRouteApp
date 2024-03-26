@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.TripUtils;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AbstractAddPage;
 import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
@@ -165,11 +166,7 @@ public class AddFragment extends Fragment {
             }
             if (event.variety == Event.EventVariety.GasEvent){
                 Event e = DataBase.getOrCreate(this.getContext()).getLastGas();
-                Log.e(getTag(), "Found gas: " + e);
                 if (e != null){
-                    Log.e(getTag(), "Found gas: " + e.variety);
-                    Log.e(getTag(), "Found gas: " + e.odometer);
-                    Log.e(getTag(), "Found gas: " + e.databaseId);
                     DataBase.getOrCreate(this.getContext()).addEvent(new Event(
                             Event.EventVariety.GasEventEnd,
                             UUID.randomUUID(),
@@ -189,7 +186,7 @@ public class AddFragment extends Fragment {
 
             currentPage.clearStorage();
 
-
+            TripUtils.setLastUpdate(getContext());
             return true;
 
         }

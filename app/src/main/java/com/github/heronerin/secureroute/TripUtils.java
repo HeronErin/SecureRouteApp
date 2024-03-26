@@ -3,6 +3,7 @@ package com.github.heronerin.secureroute;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
@@ -87,4 +88,10 @@ public class TripUtils {
         }
     }
 
+    public static void setLastUpdate(Context context){
+        SharedPreferences sp = context.getSharedPreferences("info", Context.MODE_PRIVATE);
+        SharedPreferences.Editor e = sp.edit();
+        e.putLong("last edited", System.currentTimeMillis());
+        e.apply();
+    }
 }

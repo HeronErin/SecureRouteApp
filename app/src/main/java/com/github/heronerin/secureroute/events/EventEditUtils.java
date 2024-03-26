@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.github.heronerin.secureroute.DataBase;
+import com.github.heronerin.secureroute.TripUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +35,8 @@ public class EventEditUtils {
             alert.setPositiveButton("Ok", (dialog, whichButton) -> {
                 event.noteData = editText.getText().toString();
                 DataBase.getOrCreate(context).updateEvent(event);
+
+                TripUtils.setLastUpdate(context);
             });
             alert.setNegativeButton("Cancel", (dialog, whichButton) -> {});
 
@@ -55,6 +58,8 @@ public class EventEditUtils {
             alert.setPositiveButton("Ok", (dialog, whichButton) -> {
                 event.moneyAmount = Double.valueOf(editText.getText().toString());
                 DataBase.getOrCreate(context).updateEvent(event);
+
+                TripUtils.setLastUpdate(context);
             });
             alert.setNegativeButton("Cancel", (dialog, whichButton) -> {});
 
@@ -77,6 +82,7 @@ public class EventEditUtils {
             alert.setPositiveButton("Ok", (dialog, whichButton) -> {
                 event.odometer = Long.valueOf(editText.getText().toString());
                 DataBase.getOrCreate(context).updateEvent(event);
+                TripUtils.setLastUpdate(context);
             });
             alert.setNegativeButton("Cancel", (dialog, whichButton) -> {});
 
@@ -119,6 +125,8 @@ public class EventEditUtils {
 
                     event.timeStamp = calendar1.getTimeInMillis();
                     DataBase.getOrCreate(context).updateEvent(event);
+
+                    TripUtils.setLastUpdate(context);
                 });
 
 
@@ -166,6 +174,7 @@ public class EventEditUtils {
             confirm(()-> confirm(()->{
                 DataBase db = DataBase.getOrCreate(context);
                 db.deleteEvent(event);
+                TripUtils.setLastUpdate(context);
             }, "Are truly you sure?", "This actually can't be undone!", context),
                     "Are you sure?", "Deleting an event is something that can't be undone!", context);
             return true;
@@ -195,6 +204,7 @@ public class EventEditUtils {
                 event.variety = Event.EventVariety.valueOf(selected);
 
                 DataBase.getOrCreate(context).updateEvent(event);
+                TripUtils.setLastUpdate(context);
             });
             alert.setNegativeButton("Cancel", (dialog, whichButton) -> {});
 

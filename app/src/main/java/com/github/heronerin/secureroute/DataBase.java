@@ -353,7 +353,7 @@ public class DataBase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 2)
+        if (oldVersion <= 2)
             _mkImgs(db);
     }
 
@@ -403,6 +403,7 @@ public class DataBase extends SQLiteOpenHelper {
     }
     @SuppressLint("Range")
     public synchronized boolean rebuiltByZipFile(Context context, Uri zipPath, boolean doReplace){
+        TripUtils.setLastUpdate(context);
         File dbFile = null;
         SQLiteDatabase temp_db = null;
         // Not used for now
