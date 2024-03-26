@@ -51,7 +51,7 @@ jobs:
       run: echo "signedApkfile=$(find app/build/outputs/apk/release/*.apk | grep -v 'unsigned')" >> $GITHUB_OUTPUT
 
     - name: Print sha certificate
-      run: echo ${{ secrets.KEY_PASSWORD }} |  keytool -keystore android_key.jks -list -v
+      run: echo ${{ secrets.KEY_PASSWORD }} |  keytool -keystore app/android_key.jks -list -v
 
     - name: Upload Signed Release APK to Artifacts
       uses: actions/upload-artifact@v3
