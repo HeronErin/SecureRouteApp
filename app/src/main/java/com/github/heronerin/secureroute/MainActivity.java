@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(btns[0]).callOnClick();
 
         updateNotification(this);
-
+        new driveHelper(this);
     }
 
 
