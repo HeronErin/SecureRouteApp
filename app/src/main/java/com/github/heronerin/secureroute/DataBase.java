@@ -402,9 +402,16 @@ public class DataBase extends SQLiteOpenHelper {
         return uris;
     }
     @SuppressLint("Range")
-    public synchronized boolean rebuiltByZipFile(Context context, Uri zipPath, boolean doCombine){
+    public synchronized boolean rebuiltByZipFile(Context context, Uri zipPath, boolean doReplace){
         File dbFile = null;
         SQLiteDatabase temp_db = null;
+        // Not used for now
+
+        if (doReplace){
+            SQLiteDatabase db = getWritableDatabase();
+            db.execSQL("DELETE FROM events;");
+            db.close();
+        }
 
         try(ZipInputStream input = new ZipInputStream(context.getContentResolver().openInputStream(zipPath))){
             // First entry SHOULD be the database
@@ -421,7 +428,7 @@ public class DataBase extends SQLiteOpenHelper {
 
             // Get all images from DB that is being imported
             List<String> uuids = new ArrayList<>();
-            Cursor cursor = temp_db.rawQuery("SELECT uri FROM images", new String[0]);
+            Cursor cursor = temp_db.rawQuery("SELECT uuid FROM images", new String[0]);
             while (cursor.moveToNext())
                 uuids.add(cursor.getString(0));
             cursor.close();
@@ -429,7 +436,7 @@ public class DataBase extends SQLiteOpenHelper {
             SQLiteDatabase readThisDb = getReadableDatabase();
 
             // Remove UUID we already have
-            cursor = readThisDb.rawQuery("SELECT uri FROM images", new String[0]);
+            cursor = readThisDb.rawQuery("SELECT uuid FROM images", new String[0]);
             while (cursor.moveToNext()) {
                uuids.remove(cursor.getString(0));
             }
@@ -472,14 +479,14 @@ public class DataBase extends SQLiteOpenHelper {
 
             cursor.close();
 
-
+            Log.e("DB", uuids.toString());
             // Copy images from zip to the app
             while (null != (zipEntry = input.getNextEntry())){
                 if (zipEntry.getName().equals("images/")) continue;
                 if (!zipEntry.getName().startsWith("images/")) continue;
 
                 String uuid = zipEntry.getName().substring("images/".length());
-
+                Log.e("DB", "UUID: " + uuids.toString());
                 // True if found, false otherwise
                 if (!uuids.remove(uuid)) continue;
 
@@ -493,6 +500,8 @@ public class DataBase extends SQLiteOpenHelper {
                 values = new ContentValues();
                 values.put("uri", copyToUri.toString());
                 values.put("uuid", uuid);
+                Log.e("DB", "values: " + values.toString());
+
                 writeThisdb.insert("images", null, values);
             }
             writeThisdb.close();

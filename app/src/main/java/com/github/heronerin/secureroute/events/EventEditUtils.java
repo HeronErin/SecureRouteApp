@@ -146,6 +146,21 @@ public class EventEditUtils {
         alert.show();
     }
     public static void confirm(Runnable onConfirm, String title, String body, Context context){ confirm(onConfirm, ()->{}, title, body, context); }
+
+    public static void thisOrThat(String title, String body, Context context, String thisStr, Runnable thisCallback, String thatStr, Runnable thatCallback){
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(title);
+        TextView tv = new TextView(context);
+        tv.setText(body);
+        tv.setPadding(20, 20, 20, 20);
+        alert.setView(tv);
+
+        alert.setPositiveButton(thisStr, (dialog, whichButton) -> thisCallback.run());
+        alert.setNegativeButton(thatStr, (dialog, whichButton) -> thatCallback.run());
+
+        alert.show();
+    }
+
     public static MenuItem.OnMenuItemClickListener deleteEvent(Context context, Event event){
         return item -> {
             confirm(()-> confirm(()->{
