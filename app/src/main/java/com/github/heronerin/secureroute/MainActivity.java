@@ -110,8 +110,6 @@ public class MainActivity extends AppCompatActivity {
             findViewById(btn).setOnClickListener(this::onTabClick);
         findViewById(btns[0]).callOnClick();
 
-        Log.d("LISToJumk", DataBase.getOrCreate(this).getAllImageUris().toString());
-
         updateNotification(this);
 
     }

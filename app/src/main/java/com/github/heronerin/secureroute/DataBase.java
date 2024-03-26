@@ -1,5 +1,6 @@
 package com.github.heronerin.secureroute;
 
+import android.annotation.SuppressLint;
 import android.app.backup.FileBackupHelper;
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,9 +8,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
-import android.widget.Toast;
+import android.util.Pair;
 
 import androidx.annotation.Nullable;
 
@@ -19,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -296,13 +298,13 @@ public class DataBase extends SQLiteOpenHelper {
         event.databaseId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
         return event;
     }
-    public synchronized List<String> getAllImageUris(){
-        List<String> strings = new ArrayList<>();
+    public synchronized List<Pair<String, String>> getAllImageUUIDPairs(){
+        List<Pair<String, String>> strings = new ArrayList<>();
         try(SQLiteDatabase db = this.getReadableDatabase()){
-            try(Cursor cursor = db.rawQuery("SELECT uri from images", null)) {
+            try(Cursor cursor = db.rawQuery("SELECT uuid, uri from images", null)) {
                 if (!cursor.moveToFirst()) return strings;
                 do {
-                    strings.add(cursor.getString(0));
+                    strings.add(new Pair<>(cursor.getString(0), cursor.getString(1)));
                 } while (cursor.moveToNext());
             }
         }
@@ -355,43 +357,6 @@ public class DataBase extends SQLiteOpenHelper {
             _mkImgs(db);
     }
 
-    private List<Event> handleEventDiffs(SQLiteDatabase temp_db, boolean addToNewDb){
-        Cursor cursor = temp_db.rawQuery( "SELECT DISTINCT event_id FROM events", null);
-        Set<String> uniqueEventIds = new HashSet<>();
-        while (cursor.moveToNext()) {
-            uniqueEventIds.add(cursor.getString(0));
-        }
-        cursor.close();
-
-        SQLiteDatabase mydb = getReadableDatabase();
-        cursor = mydb.rawQuery("SELECT event_id FROM events", null);
-        while (cursor.moveToNext()) {
-            uniqueEventIds.remove(cursor.getString(0));
-        }
-        cursor.close();
-
-        List<Event> events = new ArrayList<>();
-
-        cursor = temp_db.rawQuery("SELECT * FROM events WHERE event_id IN ("+StringPlaceHolderGen(uniqueEventIds.size())+")", uniqueEventIds.toArray(new String[0]));
-        while (cursor.moveToNext()) {
-            try {
-                Event e = eventFromCursor(cursor);
-                if (addToNewDb)
-                    _addEvent(mydb, e);
-
-                events.add(e);
-            } catch (JSONException e) {
-                cursor.close();
-                mydb.close();
-
-                throw new RuntimeException(e);
-            }
-        }
-        cursor.close();
-        mydb.close();
-
-        return events;
-    }
     public synchronized JSONArray resolveImgUris(JSONArray uris) throws JSONException {
         try (SQLiteDatabase db = getReadableDatabase()){
             JSONArray ret = new JSONArray();
@@ -407,6 +372,7 @@ public class DataBase extends SQLiteOpenHelper {
                 Cursor cursor = db.rawQuery("SELECT uri FROM images WHERE uuid = ? LIMIT 1", new String[]{possibleUri});
                 if (!cursor.moveToFirst()){
                     Log.e("DB", "Can't resolve image UUID: " + possibleUri);
+                    cursor.close();
                     continue;
                 }
                 JSONArray newImgJso = new JSONArray();
@@ -435,58 +401,110 @@ public class DataBase extends SQLiteOpenHelper {
         }catch (JSONException ignored) { }
         return uris;
     }
+    @SuppressLint("Range")
     public synchronized boolean rebuiltByZipFile(Context context, Uri zipPath, boolean doCombine){
+        File dbFile = null;
         SQLiteDatabase temp_db = null;
-        List<String> uris_required = null;
 
         try(ZipInputStream input = new ZipInputStream(context.getContentResolver().openInputStream(zipPath))){
-            ZipEntry zipEntry;
-            OutputStream fileOutputStream = null;
-            File file = null;
-            while(null != (zipEntry = input.getNextEntry())){
-                if (zipEntry.getName().equals("images/")) continue;
+            // First entry SHOULD be the database
+            dbFile = File.createTempFile("tempdb", ".db");
+            ZipEntry zipEntry = input.getNextEntry();
+            if (null == zipEntry || !zipEntry.getName().equals("database.db")) return false;
 
-                try{
-                    if (temp_db == null && !zipEntry.getName().equals("database.db")){
-                        Toast.makeText(context, "Can't import database", Toast.LENGTH_LONG).show();
-                        return false;
-                    }
+            FileOutputStream fileOutputStream = new FileOutputStream(dbFile);
+            TripUtils.copy(input, fileOutputStream);
 
-                    file = File.createTempFile("", null);
-                    fileOutputStream = new FileOutputStream(file);
-                    TripUtils.copy(input, fileOutputStream);
+            temp_db = SQLiteDatabase.openDatabase(dbFile.getPath(), null, SQLiteDatabase.OPEN_READWRITE);
+            if (temp_db.getVersion() != DB_VERSION)
+                onUpgrade(temp_db, temp_db.getVersion(), DB_VERSION);
 
-                    if (temp_db == null && zipEntry.getName().equals("database.db")){
-                        temp_db = SQLiteDatabase.openDatabase(file.getPath(), null, SQLiteDatabase.OPEN_READONLY);
-                        if (temp_db.getVersion() != DB_VERSION)
-                            onUpgrade(temp_db, temp_db.getVersion(), DB_VERSION);
+            // Get all images from DB that is being imported
+            List<String> uuids = new ArrayList<>();
+            Cursor cursor = temp_db.rawQuery("SELECT uri FROM images", new String[0]);
+            while (cursor.moveToNext())
+                uuids.add(cursor.getString(0));
+            cursor.close();
 
-                        uris_required = eventsToUris(handleEventDiffs(temp_db, doCombine));
-                        continue;
-                    }
-                    if (!zipEntry.getName().startsWith("images/")) continue;
-                    String number = zipEntry.getName();
-                    if (number.contains(".")) number=number.split("\\.")[0];
+            SQLiteDatabase readThisDb = getReadableDatabase();
 
-                    if (!uris_required.contains(number)) continue;
+            // Remove UUID we already have
+            cursor = readThisDb.rawQuery("SELECT uri FROM images", new String[0]);
+            while (cursor.moveToNext()) {
+               uuids.remove(cursor.getString(0));
+            }
+            cursor.close();
+            readThisDb.close();
 
-                    uris_required.remove(number);
+            SQLiteDatabase writeThisdb = getWritableDatabase();
 
-
-                }finally {
-                    if (file != null && !zipEntry.getName().equals("database.db"))
-                        file.delete();
-                    if (fileOutputStream != null)
-                        fileOutputStream.close();
+            // Insert events
+            cursor = temp_db.rawQuery("SELECT * from events", new String[0]);
+            while(cursor.moveToNext()){
+                String eventId = cursor.getString(cursor.getColumnIndex("event_id"));
+                Cursor checkCursor = writeThisdb.rawQuery("SELECT COUNT(*) FROM events WHERE event_id = ?", new String[]{eventId});
+                int count = 0;
+                if (checkCursor.moveToFirst()) {
+                    count = checkCursor.getInt(0);
                 }
+                checkCursor.close();
+
+                if (count != 0) continue;
+
+                ContentValues values = new ContentValues();
+                values.put("variety", cursor.getString(cursor.getColumnIndex("variety")));
+                values.put("event_id", eventId);
+                values.put("timestamp", cursor.getLong(cursor.getColumnIndex("timestamp")));
+
+                if (!cursor.isNull(cursor.getColumnIndex("expense_value")))
+                    values.put("expense_value", cursor.getDouble(cursor.getColumnIndex("expense_value")));
+                if (!cursor.isNull(cursor.getColumnIndex("associated_pair")))
+                    values.put("associated_pair", cursor.getInt(cursor.getColumnIndex("associated_pair")));
+                if (!cursor.isNull(cursor.getColumnIndex("odometer")))
+                    values.put("odometer", cursor.getLong(cursor.getColumnIndex("odometer")));
+                if (!cursor.isNull(cursor.getColumnIndex("note_data")))
+                    values.put("note_data", cursor.getString(cursor.getColumnIndex("note_data")));
+                if (!cursor.isNull(cursor.getColumnIndex("image_uri")))
+                    values.put("image_uri", cursor.getString(cursor.getColumnIndex("image_uri")));
+
+                writeThisdb.insert("events", null, values);
             }
 
+            cursor.close();
 
 
-        } catch (FileNotFoundException e) {
+            // Copy images from zip to the app
+            while (null != (zipEntry = input.getNextEntry())){
+                if (zipEntry.getName().equals("images/")) continue;
+                if (!zipEntry.getName().startsWith("images/")) continue;
 
-        } catch (IOException e) {
+                String uuid = zipEntry.getName().substring("images/".length());
+
+                // True if found, false otherwise
+                if (!uuids.remove(uuid)) continue;
+
+                ContentValues values = new ContentValues();
+
+                values.put(MediaStore.Images.Media.TITLE, uuid);
+                Uri copyToUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                try(OutputStream outputStream = new BufferedOutputStream(context.getContentResolver().openOutputStream(copyToUri))){
+                    TripUtils.copy(input, outputStream);
+                }
+                values = new ContentValues();
+                values.put("uri", copyToUri.toString());
+                values.put("uuid", uuid);
+                writeThisdb.insert("images", null, values);
+            }
+            writeThisdb.close();
+
+
+
+
+        } catch (FileNotFoundException ignored) { return false; } catch (IOException e) {
             throw new RuntimeException(e);
+        }finally {
+            if (temp_db != null) temp_db.close();
+            if (dbFile != null) dbFile.delete();
         }
         return true;
 
@@ -494,15 +512,14 @@ public class DataBase extends SQLiteOpenHelper {
     public synchronized void exportDBToZip(Context context, Uri exportTo){
         try (ZipOutputStream out =  new ZipOutputStream(context.getContentResolver().openOutputStream(exportTo, "w"));){
             out.putNextEntry(new ZipEntry("database.db"));
-
             writeDBToFile(context, out);
-            out.putNextEntry(new ZipEntry("images/"));
-            for (String uri : getAllImageUris()){
-                String[] split = uri.split("/");
-                String number = split[split.length-1];
 
-                out.putNextEntry(new ZipEntry("images/" + number));
-                try(InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(uri))){
+            out.putNextEntry(new ZipEntry("images/"));
+            for (Pair<String, String> uri : getAllImageUUIDPairs()){
+
+
+                out.putNextEntry(new ZipEntry("images/" + uri.first));
+                try(InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(uri.second))){
                     TripUtils.copy(inputStream, out);
                 }
 
