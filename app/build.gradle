@@ -18,9 +18,9 @@ android {
     signingConfigs {
         release {
             storeFile file("android_key.jks")
-            storePassword System.getenv("S_PASSWORD")
+            storePassword (System.getenv("S_PASSWORD") ?: file('../signing_password.txt').getText('UTF-8').trim())
             keyAlias 'key0'
-            keyPassword System.getenv("S_PASSWORD")
+            keyPassword (System.getenv("S_PASSWORD") ?: file('../signing_password.txt').getText('UTF-8').trim())
         }
     }
 
@@ -28,6 +28,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug{
             signingConfig signingConfigs.release
         }
     }
