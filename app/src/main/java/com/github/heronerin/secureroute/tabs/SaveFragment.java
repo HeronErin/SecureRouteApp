@@ -63,7 +63,11 @@ public class SaveFragment extends Fragment {
     void onUserImportSelector(Uri zipfile, boolean doReplace){
         EventEditUtils.confirm(()->
                 DataBase.getOrCreate(this.getContext()).rebuiltByZipFile(getContext(), zipfile, doReplace),
-                "Are your sure?", "This WILL do lasting damage to your database!", this.getContext());
+                "Are your sure?",
+                    doReplace
+                            ? "This WILL do lasting damage to your database! Replacing the database involves DELETING THE DATABASE and replacing it!"
+                            : "Merging the database may cause issues, and is a CPU intensive task.",
+                this.getContext());
     }
 
 
