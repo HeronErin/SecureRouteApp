@@ -37,7 +37,7 @@ jobs:
     - name: Build Release APK
       run: |
         export S_PASSWORD=${{ secrets.KEY_PASSWORD }}
-	echo ${{ secrets.KEY_PASSWORD }} > signing_password.txt
+        echo ${{ secrets.KEY_PASSWORD }} > signing_password.txt
         ./gradlew assembleRelease --stacktrace
 
     - name: Sign Release APK
