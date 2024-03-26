@@ -114,12 +114,12 @@ public class NoteViewer extends AppCompatActivity {
         List<ImageManager.ImgTitleCombo> imageComboList = new ArrayList<>();
         ImageAdaptor imageAdaptor = new ImageAdaptor(activity, imageComboList);
 
-        JSONArray jsonImgs = event.getImageData();
-
-        if (jsonImgs.length() == 0)
-            activity.findViewById(R.id.imagesTitle).setVisibility(View.GONE);
-
         try {
+            JSONArray jsonImgs =  DataBase.getOrCreate(activity).resolveImgUris(event.getImageData());
+
+            if (jsonImgs.length() == 0)
+                activity.findViewById(R.id.imagesTitle).setVisibility(View.GONE);
+
             for (int i = 0; i < jsonImgs.length(); i++){
                 JSONArray img = jsonImgs.getJSONArray(i);
                 imageAdaptor.add(new ImageManager.ImgTitleCombo(img.getString(0), img.getString(1)));

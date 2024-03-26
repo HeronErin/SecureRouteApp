@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.github.heronerin.secureroute.DataBase;
@@ -47,31 +48,7 @@ public class SaveFragment extends Fragment {
         intent.putExtra(Intent.EXTRA_TITLE, "routeDatabaseBackup.zip");
         startActivityForResult(intent, EXPORT_RES);
     }
-    void exportDBToZip(Uri exportTo){
-        Log.d(getTag(), exportTo.toString());
-        try (ZipOutputStream out =  new ZipOutputStream(getContext().getContentResolver().openOutputStream(exportTo, "w"));){
-            out.putNextEntry(new ZipEntry("database.db"));
 
-            if (!DataBase.getOrCreate(getContext())
-                    .writeDBToFile(getContext(), out)){
-                Toast.makeText(getContext(), "Error exporting database", Toast.LENGTH_LONG).show();
-                return;
-            }
-            out.putNextEntry(new ZipEntry("images/"));
-            for (String uri : DataBase.getOrCreate(this.getContext()).getAllImageUris()){
-                String[] split = uri.split("/");
-                String number = split[split.length-1];
-                out.putNextEntry(new ZipEntry("images/" + number));
-
-                try(InputStream inputStream = getContext().getContentResolver().openInputStream(Uri.parse(uri))){
-                    TripUtils.copy(inputStream, out);
-                }
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -84,7 +61,7 @@ public class SaveFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EXPORT_RES && resultCode == Activity.RESULT_OK)
-            exportDBToZip(data.getData());
+            DataBase.getOrCreate(this.getContext()).exportDBToZip(this.getContext(), data.getData());
 
 
     }
