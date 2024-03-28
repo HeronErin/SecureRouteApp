@@ -43,7 +43,7 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/*'
-        exclude 'org/apache/http/**'
+//        exclude 'org/apache/http/**'
     }
     lint {
         baseline = file("lint-baseline.xml")
@@ -66,9 +66,9 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
-    implementation libs.okhttp
+//    implementation libs.okhttp
     implementation libs.swiperefreshlayout
-    implementation libs.okhttp.urlconnection
+//    implementation libs.okhttp.urlconnection
     implementation libs.material.v190
     implementation libs.commons.codec
 
