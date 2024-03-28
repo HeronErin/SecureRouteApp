@@ -19,7 +19,9 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -90,6 +92,15 @@ public class GoogleDriveHelper {
     public static void deleteFile(Context context, File file) throws IOException {
         Drive d = getDrive(context);
         d.files().delete(file.getId()).execute();
+    }
+    public static java.io.File downloadFile(Context context, File file) throws IOException{
+        Drive d = getDrive(context);
+        java.io.File output = java.io.File.createTempFile("downloaded", ".zip");
+
+        try (OutputStream outputStream = new FileOutputStream(output)) {
+            d.files().get(file.getId()).executeMediaAndDownloadTo(outputStream);
+        }
+        return output;
     }
     public static List<File> getDatabases(Context context) throws IOException {
         Drive drive = getDrive(context);

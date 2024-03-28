@@ -64,9 +64,9 @@ public class NoteViewer extends AppCompatActivity {
             ImageView image = (ImageView)listItem.findViewById(R.id.imgPreview);
 
             Glide.with(mContext)
-                    .load(imageUri)
-                    .override(256, 256) // Set the desired preview size
-                    .into(image);
+                .load(imageUri)
+                .override(256, 256) // Set the desired preview size
+                .into(image);
 
             final TextView title = (TextView) listItem.findViewById(R.id.ImgName);
             title.setText(combo.title);

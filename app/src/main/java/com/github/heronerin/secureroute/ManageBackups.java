@@ -1,7 +1,10 @@
 package com.github.heronerin.secureroute;
 
+import static com.github.heronerin.secureroute.events.EventEditUtils.confirm;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +23,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.github.heronerin.secureroute.events.EventEditUtils;
 import com.google.api.services.drive.model.File;
 
 import java.io.IOException;
@@ -29,6 +33,33 @@ import java.util.List;
 public class ManageBackups extends AppCompatActivity {
     FragmentActivity mContext;
     List<File> fileList;
+
+
+    private static void handleDb(FragmentActivity context, File file, boolean doReplace){
+        confirm(()->
+            new Thread(()->{
+                java.io.File osFile = null;
+                try {
+                    osFile = GoogleDriveHelper.downloadFile(context, file);
+                    java.io.File finalOsFile = osFile;
+                    context.runOnUiThread(()->{
+                        DataBase.getOrCreate(context).rebuiltByZipFile(context, Uri.fromFile(finalOsFile), doReplace);
+
+                        finalOsFile.delete();
+                        Toast.makeText(context, "Reset from backup successful.", Toast.LENGTH_LONG).show();
+                    });
+
+                } catch (IOException e) {
+                    context.runOnUiThread(()->Toast.makeText(context, "Downloading error", Toast.LENGTH_LONG).show());
+                }
+            }).start(),
+            "Are your sure?",
+            doReplace
+                    ? "This WILL do lasting damage to your database! Replacing the database involves DELETING THE DATABASE and replacing it!"
+                    : "Merging the database may cause issues, and is a CPU intensive task.",
+            context
+        );
+    }
     class BackupAdapter extends ArrayAdapter<File>{
         public BackupAdapter(@NonNull FragmentActivity context, List<File> list) {
             super(context, 0 , list);
@@ -45,7 +76,7 @@ public class ManageBackups extends AppCompatActivity {
             final File file = fileList.get(position);
             ((TextView)listItem.findViewById(R.id.backupDate)).setText(new Date(file.getModifiedTime().getValue()).toString());
 
-            listItem.findViewById(R.id.trashBtn).setOnClickListener((view)->{
+            listItem.findViewById(R.id.trashBtn).setOnClickListener((__)->{
                 new Thread(()->{
                     try {
                         GoogleDriveHelper.deleteFile(mContext, file);
@@ -56,9 +87,16 @@ public class ManageBackups extends AppCompatActivity {
 
                         return;
                     }
-                    this.remove(file);
+                    mContext.runOnUiThread(()->this.remove(file));
                 }).start();
-
+            });
+            listItem.findViewById(R.id.downloadBtn).setOnClickListener((__)->{
+                EventEditUtils.thisOrThat(
+                        "Merge or Replace", "Would you like to merge with you current database, or replace it?",
+                        this.getContext(),
+                        "Merge", ()->handleDb(mContext, file, false),
+                        "Replace", ()->handleDb(mContext, file, true)
+                );
             });
 
             return listItem;
