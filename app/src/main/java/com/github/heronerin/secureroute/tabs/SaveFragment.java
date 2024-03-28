@@ -1,33 +1,28 @@
 package com.github.heronerin.secureroute.tabs;
 
+import static com.github.heronerin.secureroute.GoogleDriveHelper.GOOGLE_SIGNIN;
+import static com.github.heronerin.secureroute.GoogleDriveHelper.signIn;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
-import com.github.heronerin.secureroute.TripUtils;
 import com.github.heronerin.secureroute.events.EventEditUtils;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class SaveFragment extends Fragment {
     public SaveFragment() {
@@ -74,7 +69,6 @@ public class SaveFragment extends Fragment {
                 this.getContext());
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -87,8 +81,13 @@ public class SaveFragment extends Fragment {
         String lastEdit = "Last edited at: " + (new Date(sp.getLong("last edited", 0))).toString();
         ((TextView)view.findViewById(R.id.lastSaved)).setText(lastEdit);
 
+        view.findViewById(R.id.accountsGoogleBtn).setOnClickListener((v)->signIn(getActivity()));
+        view.findViewById(R.id.accountsGoogleBtn).setBackgroundColor(
+                GoogleSignIn.getLastSignedInAccount(getContext()) == null ? Color.RED : Color.GREEN
+        );
         return view;
     }
+    
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EXPORT_RES && resultCode == Activity.RESULT_OK)
@@ -100,6 +99,11 @@ public class SaveFragment extends Fragment {
                     "Merge", ()->onUserImportSelector(data.getData(), false),
                     "Replace", ()->onUserImportSelector(data.getData(), true)
             );
+        if (requestCode == GOOGLE_SIGNIN && resultCode == Activity.RESULT_OK){
+            getActivity().findViewById(R.id.accountsGoogleBtn).setBackgroundColor(
+                    GoogleSignIn.getLastSignedInAccount(getContext()) == null ? Color.RED : Color.GREEN
+            );
+        }
 
 
     }

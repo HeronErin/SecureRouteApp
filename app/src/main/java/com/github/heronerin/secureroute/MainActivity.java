@@ -27,7 +27,9 @@ import com.github.heronerin.secureroute.tabs.EventList;
 import com.github.heronerin.secureroute.tabs.SettingsFragment;
 import com.github.heronerin.secureroute.tabs.StatsFragment;
 import com.github.heronerin.secureroute.tabs.SaveFragment;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -111,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
         findViewById(btns[0]).callOnClick();
 
         updateNotification(this);
-
     }
 
 
