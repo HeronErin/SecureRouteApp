@@ -67,7 +67,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
 //    implementation libs.okhttp
-    implementation libs.swiperefreshlayout
+//    implementation libs.swiperefreshlayout
 //    implementation libs.okhttp.urlconnection
     implementation libs.material.v190
     implementation libs.commons.codec
@@ -79,8 +79,5 @@ dependencies {
     implementation 'com.google.api-client:google-api-client-android:2.1.2'
     implementation 'com.google.apis:google-api-services-drive:v3-rev197-1.25.0'
 
-    implementation (libs.swiperefreshlayout) {
-        exclude group: 'commons-logging', module: 'commons-logging'
-        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-    }
+
 }
