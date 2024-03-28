@@ -71,11 +71,11 @@
             android:text="Accounts" />
 
         <Button
-            android:id="@+id/onOffGoogleBtn"
+            android:id="@+id/backUpNow"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="On / Off" />
+            android:text="Backup now" />
     </LinearLayout>
     </LinearLayout>
 </ScrollView>

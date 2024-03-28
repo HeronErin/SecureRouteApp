@@ -2,7 +2,6 @@ package com.github.heronerin.secureroute;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.fragment.app.FragmentActivity;
 
@@ -12,9 +11,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
 import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
@@ -22,9 +20,8 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import java.util.List;
 
 public class GoogleDriveHelper {
     public final static int GOOGLE_SIGNIN = 69345;
@@ -40,89 +37,23 @@ public class GoogleDriveHelper {
     public static GoogleSignInAccount getAccountForDrive(Context context){
         return GoogleSignIn.getAccountForScopes(context, new Scope(DriveScopes.DRIVE_APPDATA));
     }
-    public static void getLastDriveBackup(Context context) throws IOException {
-        GoogleSignInAccount account = getAccountForDrive(context);
-//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
-        if (account.getAccount() == null)
-            throw  new RuntimeException("Can't get account");
 
-        GoogleAccountCredential credential =
-                GoogleAccountCredential.usingOAuth2(
-                        context, Collections.singletonList(DriveScopes.DRIVE_APPDATA));
-        credential.setSelectedAccount(account.getAccount());
-        new Thread(()->{
-            try {
-                java.io.File f = java.io.File.createTempFile("tempdb", ".json");
-
-
-                Drive d = new Drive.Builder(
-                        AndroidHttp.newCompatibleTransport(),
-                        new GsonFactory(),
-                        credential)
-                        .setApplicationName("Secure Route")
-                        .build();
-
-                File fileMetadata = new File();
-                fileMetadata.setName("database.json");
-                fileMetadata.setParents(Collections.singletonList("appDataFolder"));
-                fileMetadata.setMimeType("application/json");
-
-                File file = d.files().create(fileMetadata, new FileContent("application/json", f))
-                        .setFields("id")
-                        .execute();
-//                System.out.println("File ID: " + file.getId());
-//                System.out.println("File ID: " + d.files().list().size());
-                FileList result = d.files().list()
-                        .setQ("mimeType='application/json'")
-                        .setSpaces("appDataFolder")
-                        .setFields("files(id, name, modifiedTime)")
-                        .execute();
-                System.out.println("File list: " + result.getFiles().size());
-                for (int i = 0; i < result.getFiles().size(); i++) {
-                    file = result.getFiles().get(i);
-                    System.out.println(file.getName() + " : " + file.getModifiedTime().toString());
-//                    d.files().delete(file.getId()).execute();
-                }
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        }).start();
-
-        return;
-    }
-
-    public static void uploadBackup(Context context) {
-        new Thread(()-> {
+    public static Thread uploadBackup(Context context) {
+        Thread t = new Thread(()-> {
             DataBase db = DataBase.getOrCreate(context);
             java.io.File zipFileObject = null;
             try {
                 zipFileObject = java.io.File.createTempFile("tempExport", ".zip");
 
                 db.exportDBToZip(context, Uri.fromFile(zipFileObject));
-                GoogleSignInAccount account = getAccountForDrive(context);
-                if (account.getAccount() == null)
-                    throw new RuntimeException("Can't get account");
-
-                GoogleAccountCredential credential =
-                        GoogleAccountCredential.usingOAuth2(
-                                context, Collections.singletonList(DriveScopes.DRIVE_APPDATA));
-                credential.setSelectedAccount(account.getAccount());
-
-                Drive d = new Drive.Builder(
-                        AndroidHttp.newCompatibleTransport(),
-                        new GsonFactory(),
-                        credential)
-                        .setApplicationName("Secure Route")
-                        .build();
+                Drive d = getDrive(context);
 
                 File fileMetadata = new File();
                 fileMetadata.setName("backup.zip");
                 fileMetadata.setParents(Collections.singletonList("appDataFolder"));
                 fileMetadata.setMimeType("application/zip");
 
-                File file = d.files().create(fileMetadata, new FileContent("application/zip", zipFileObject))
+                d.files().create(fileMetadata, new FileContent("application/zip", zipFileObject))
                         .setFields("id")
                         .execute();
 
@@ -134,8 +65,43 @@ public class GoogleDriveHelper {
                 if (zipFileObject != null)
                     zipFileObject.delete();
             }
-        }).start();
+        });
+        t.start();
+        return t;
     }
+
+    private static Drive getDrive(Context context){
+        GoogleSignInAccount account = getAccountForDrive(context);
+        if (account.getAccount() == null)
+            throw new RuntimeException("Can't get account");
+
+        GoogleAccountCredential credential =
+                GoogleAccountCredential.usingOAuth2(
+                        context, Collections.singletonList(DriveScopes.DRIVE_APPDATA));
+        credential.setSelectedAccount(account.getAccount());
+
+        return new Drive.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new GsonFactory(),
+                credential)
+                .setApplicationName("Secure Route")
+                .build();
+    }
+    public static void deleteFile(Context context, File file) throws IOException {
+        Drive d = getDrive(context);
+        d.files().delete(file.getId()).execute();
+    }
+    public static List<File> getDatabases(Context context) throws IOException {
+        Drive drive = getDrive(context);
+        FileList files = drive
+            .files().list()
+            .setQ("mimeType='application/zip'")
+            .setSpaces("appDataFolder")
+            .setFields("files(id, name, modifiedTime)")
+            .execute();
+        return files.getFiles();
+    }
+
 
 ////        DriveResourceClient resourceClient = Drive.getDriveResourceClient(context, account);
 //        Drive service = new Drive.Builder(new NetHttpTransport(),

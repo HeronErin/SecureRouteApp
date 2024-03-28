@@ -24,6 +24,9 @@
         android:theme="@style/Theme.SecureRouteKeeper"
         tools:targetApi="31">
         <activity
+            android:name=".ManageBackups"
+            android:exported="false" />
+        <activity
             android:name=".ImageManager"
             android:exported="false" />
         <activity

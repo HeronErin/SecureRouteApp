@@ -13,11 +13,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.github.heronerin.secureroute.DataBase;
+import com.github.heronerin.secureroute.GoogleDriveHelper;
+import com.github.heronerin.secureroute.ManageBackups;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.EventEditUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -81,11 +85,44 @@ public class SaveFragment extends Fragment {
         String lastEdit = "Last edited at: " + (new Date(sp.getLong("last edited", 0))).toString();
         ((TextView)view.findViewById(R.id.lastSaved)).setText(lastEdit);
 
-        view.findViewById(R.id.accountsGoogleBtn).setOnClickListener((v)->signIn(getActivity()));
-        view.findViewById(R.id.accountsGoogleBtn).setBackgroundColor(
-                GoogleSignIn.getLastSignedInAccount(getContext()) == null ? Color.RED : Color.GREEN
-        );
+        modifyGoogleBtn(view.findViewById(R.id.accountsGoogleBtn));
+        view.findViewById(R.id.backUpNow).setOnClickListener((v)->{
+            if (GoogleSignIn.getLastSignedInAccount(getContext()) == null){
+                Toast.makeText(getContext(), "Please login to google to backup", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            backup();
+        });
+
         return view;
+    }
+
+    private void modifyGoogleBtn(Button button){
+        boolean accountNotFound = GoogleSignIn.getLastSignedInAccount(getContext()) == null;
+        button.setBackgroundColor(
+                accountNotFound ? Color.RED : Color.GREEN
+        );
+        button.setText(
+                accountNotFound ? "Accounts" : "Backups"
+        );
+        if (accountNotFound)
+            button.setOnClickListener((v)->signIn(getActivity()));
+        else
+            button.setOnClickListener((v)->startActivity(new Intent(getContext(), ManageBackups.class)));
+    }
+    private void backup(){
+        Toast.makeText(getContext(), "Starting backup upload", Toast.LENGTH_SHORT).show();
+        new Thread(()->{
+            try {
+                GoogleDriveHelper.uploadBackup(getContext()).join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            SaveFragment.this.getActivity().runOnUiThread(()->
+                    Toast.makeText(getContext(), "Finished backup upload", Toast.LENGTH_LONG).show()
+            );
+
+        }).start();
     }
     
     @Override
@@ -99,11 +136,9 @@ public class SaveFragment extends Fragment {
                     "Merge", ()->onUserImportSelector(data.getData(), false),
                     "Replace", ()->onUserImportSelector(data.getData(), true)
             );
-        if (requestCode == GOOGLE_SIGNIN && resultCode == Activity.RESULT_OK){
-            getActivity().findViewById(R.id.accountsGoogleBtn).setBackgroundColor(
-                    GoogleSignIn.getLastSignedInAccount(getContext()) == null ? Color.RED : Color.GREEN
-            );
-        }
+        if (requestCode == GOOGLE_SIGNIN && resultCode == Activity.RESULT_OK)
+            modifyGoogleBtn(getActivity().findViewById(R.id.accountsGoogleBtn));
+
 
 
     }

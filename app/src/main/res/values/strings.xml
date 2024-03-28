@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Secure Route</string>
 
-<!--    Since this is restricted to only this app, it is not that bad to have public. Still not good practice-->
+    <!--    Since this is restricted to only this app, it is not that bad to have public. Still not good practice-->
     <string name="client_id">244113212850-1447iegol1kv3e33i0idjns20pudaavt.apps.googleusercontent.com</string>
 
     <string name="add_an_image_s">Add an image(s)</string>
