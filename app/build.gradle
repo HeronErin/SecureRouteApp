@@ -46,10 +46,7 @@ android {
     }
 }
 
-
-
 dependencies {
-
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
@@ -73,28 +70,15 @@ dependencies {
 
     implementation 'com.github.AppDevNext:AndroidChart:3.1.0.21'
 
-
-
-//    implementation('com.google.api-client:google-api-client-android:1.23.0') {
-//        exclude group: 'org.apache.httpcomponents'
-//    }
-//    implementation('com.google.apis:google-api-services-drive:v3-rev114-1.23.0') {
-//        exclude group: 'org.apache.httpcomponents'
-//    }
-//    implementation 'com.google.android.gms:play-services-auth:21.0.0'
-//    implementation 'com.google.android.gms:play-services-drive:16.1.0'
-//    implementation 'com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0'
-//    implementation 'com.google.auth:google-auth-library-oauth2-http:1.23.0'
-//    implementation 'com.google.android.gms:play-services-auth:20.3.0'
     /** Google Drive Sync **/
     implementation 'com.google.http-client:google-http-client-gson:1.42.2'
     implementation 'com.google.android.gms:play-services-auth:20.3.0'
     implementation('com.google.api-client:google-api-client-android:1.30.2') {
-        exclude group: 'org.apache.httpcomponents'
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+        exclude group: 'commons-logging', module: 'commons-logging'
     }
     implementation('com.google.apis:google-api-services-drive:v3-rev173-1.25.0') {
-        exclude group: 'org.apache.httpcomponents'
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+        exclude group: 'commons-logging', module: 'commons-logging'
     }
-
-
 }
