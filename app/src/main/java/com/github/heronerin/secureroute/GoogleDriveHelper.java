@@ -13,7 +13,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
@@ -84,7 +84,7 @@ public class GoogleDriveHelper {
 
         return new Drive.Builder(
                 new NetHttpTransport(),
-                JacksonFactory.getDefaultInstance(),
+                GsonFactory.getDefaultInstance(),
                 credential)
                 .setApplicationName("Secure Route")
                 .build();
