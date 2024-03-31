@@ -1,7 +1,6 @@
 package com.github.heronerin.secureroute.eventViewer;
 
 import android.annotation.SuppressLint;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -30,7 +29,6 @@ import com.github.heronerin.secureroute.ImageManager;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.events.EventArrayAdapter;
-import com.github.heronerin.secureroute.tabs.addPages.AbstractAddPage;
 import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 
 import org.json.JSONArray;
@@ -42,12 +40,10 @@ import java.util.List;
 public class NoteViewer extends AppCompatActivity {
     static class ImageAdaptor extends ArrayAdapter<ImageManager.ImgTitleCombo> {
 
-        private Context mContext;
         private List<ImageManager.ImgTitleCombo> imageComboList = new ArrayList<>();
 
         public ImageAdaptor(@NonNull Context context, List<ImageManager.ImgTitleCombo> list) {
             super(context, 0 , list);
-            mContext = context;
             imageComboList = list;
         }
 
@@ -57,13 +53,13 @@ public class NoteViewer extends AppCompatActivity {
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             View listItem = convertView;
             if(listItem == null)
-                listItem = LayoutInflater.from(mContext).inflate(R.layout.photo_list_item,parent,false);
+                listItem = LayoutInflater.from(getContext()).inflate(R.layout.photo_list_item,parent,false);
             ImageManager.ImgTitleCombo combo = imageComboList.get(position);
 
             final Uri imageUri = Uri.parse(combo.img);
             ImageView image = (ImageView)listItem.findViewById(R.id.imgPreview);
 
-            Glide.with(mContext)
+            Glide.with(getContext())
                 .load(imageUri)
                 .override(256, 256) // Set the desired preview size
                 .into(image);
@@ -77,7 +73,7 @@ public class NoteViewer extends AppCompatActivity {
 
 
                 intent.setDataAndType(imageUri, "image/*");
-                mContext.startActivity(intent);
+                getContext().startActivity(intent);
             });
 
             return listItem;

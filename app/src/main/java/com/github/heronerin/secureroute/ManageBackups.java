@@ -3,7 +3,7 @@ package com.github.heronerin.secureroute;
 import static com.github.heronerin.secureroute.events.EventEditUtils.confirm;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -31,11 +31,11 @@ import java.util.Date;
 import java.util.List;
 
 public class ManageBackups extends AppCompatActivity {
-    FragmentActivity mContext;
+//    FragmentActivity mContext;
     List<File> fileList;
 
 
-    private static void handleDb(FragmentActivity context, File file, boolean doReplace){
+    private static void handleDb(Activity context, File file, boolean doReplace){
         confirm(()->
             new Thread(()->{
                 java.io.File osFile = null;
@@ -63,7 +63,7 @@ public class ManageBackups extends AppCompatActivity {
     class BackupAdapter extends ArrayAdapter<File>{
         public BackupAdapter(@NonNull FragmentActivity context, List<File> list) {
             super(context, 0 , list);
-            mContext = context;
+//            mContext = context;
             fileList = list;
         }
         @SuppressLint("ResourceType")
@@ -72,30 +72,30 @@ public class ManageBackups extends AppCompatActivity {
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             View listItem = convertView;
             if (listItem == null)
-                listItem = LayoutInflater.from(mContext).inflate(R.layout.backup_list_item, parent, false);
+                listItem = LayoutInflater.from(getContext()).inflate(R.layout.backup_list_item, parent, false);
             final File file = fileList.get(position);
             ((TextView)listItem.findViewById(R.id.backupDate)).setText(new Date(file.getModifiedTime().getValue()).toString());
 
             listItem.findViewById(R.id.trashBtn).setOnClickListener((__)->{
                 new Thread(()->{
                     try {
-                        GoogleDriveHelper.deleteFile(mContext, file);
+                        GoogleDriveHelper.deleteFile(getContext(), file);
                     } catch (IOException e) {
-                        mContext.runOnUiThread(()->
-                                        Toast.makeText(mContext, "deletion failed", Toast.LENGTH_LONG).show()
+                        getParent().runOnUiThread(()->
+                                        Toast.makeText(getContext(), "deletion failed", Toast.LENGTH_LONG).show()
                                 );
 
                         return;
                     }
-                    mContext.runOnUiThread(()->this.remove(file));
+                    getParent().runOnUiThread(()->this.remove(file));
                 }).start();
             });
             listItem.findViewById(R.id.downloadBtn).setOnClickListener((__)->{
                 EventEditUtils.thisOrThat(
                         "Merge or Replace", "Would you like to merge with you current database, or replace it?",
                         this.getContext(),
-                        "Merge", ()->handleDb(mContext, file, false),
-                        "Replace", ()->handleDb(mContext, file, true)
+                        "Merge", ()->handleDb(getParent(), file, false),
+                        "Replace", ()->handleDb(getParent(), file, true)
                 );
             });
 
@@ -127,7 +127,7 @@ public class ManageBackups extends AppCompatActivity {
                 });
             } catch (IOException e) {
                 ManageBackups.this.runOnUiThread(()->
-                                Toast.makeText(mContext, "Failure to get google drive listing", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, "Failure to get google drive listing", Toast.LENGTH_LONG).show()
                         );
             }
         }).start();

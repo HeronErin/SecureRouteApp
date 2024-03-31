@@ -2,7 +2,6 @@ package com.github.heronerin.secureroute.eventViewer;
 
 import static com.github.heronerin.secureroute.eventViewer.NoteViewer.handleNoteViewAndImgs;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TextView;
 

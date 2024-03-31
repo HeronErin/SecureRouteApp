@@ -5,4 +5,6 @@
     <string name="client_id">244113212850-1447iegol1kv3e33i0idjns20pudaavt.apps.googleusercontent.com</string>
 
     <string name="add_an_image_s">Add an image(s)</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

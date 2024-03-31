@@ -1,5 +1,6 @@
 package com.github.heronerin.secureroute;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -7,8 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.Manifest;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -25,12 +24,10 @@ import androidx.core.view.WindowInsetsCompat;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.AddFragment;
 import com.github.heronerin.secureroute.tabs.EventList;
+import com.github.heronerin.secureroute.tabs.SaveFragment;
 import com.github.heronerin.secureroute.tabs.SettingsFragment;
 import com.github.heronerin.secureroute.tabs.StatsFragment;
-import com.github.heronerin.secureroute.tabs.SaveFragment;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

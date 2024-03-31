@@ -3,10 +3,6 @@ package com.github.heronerin.secureroute.tabs;
 import static com.github.heronerin.secureroute.MainActivity.updateNotification;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +11,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.TripUtils;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AbstractAddPage;
 import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
+import com.github.heronerin.secureroute.tabs.addPages.AddMillageTrackingFragment;
 import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 import com.github.heronerin.secureroute.tabs.addPages.AddTripFragment;
 import com.github.heronerin.secureroute.tabs.addPages.GasFillUpFragment;
@@ -30,9 +29,7 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class AddFragment extends Fragment {
@@ -46,6 +43,7 @@ public class AddFragment extends Fragment {
                 AddIncomeFragment.newInstance(),
                 GasFillUpFragment.newInstance(),
                 AddTripFragment.newInstance(),
+                AddMillageTrackingFragment.newInstance(),
                 RangeEventAddFragment.newInstance()
         ));
     }

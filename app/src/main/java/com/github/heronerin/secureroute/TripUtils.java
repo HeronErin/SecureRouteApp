@@ -16,7 +16,6 @@ import androidx.core.app.NotificationManagerCompat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.time.Duration;
 
 public class TripUtils {
     public static final String ONGOING_TRIP_CHANNEL = "Ongoing Trip";

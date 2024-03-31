@@ -16,7 +16,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
-import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 
 public class IncomeViewer extends AppCompatActivity {
     Event event;

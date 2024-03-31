@@ -7,7 +7,6 @@ package com.github.heronerin.secureroute.tabs.addPages;
 
 import static android.app.Activity.RESULT_OK;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,11 +26,8 @@ import com.github.heronerin.secureroute.events.Event;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
-@SuppressLint("MissingInflatedId")
 public class AddNoteFragment extends AbstractAddPage {
     @Override
     public boolean isValid() {

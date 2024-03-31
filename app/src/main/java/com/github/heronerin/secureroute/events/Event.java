@@ -1,6 +1,21 @@
 package com.github.heronerin.secureroute.events;
 
-import static com.github.heronerin.secureroute.events.Event.EventVariety.*;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.ArbitraryNote;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.ArbitraryRangeEnd;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.ArbitraryRangeStart;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.Empty;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.Expense;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.FullTrip;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.GasEvent;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.GasEventEnd;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.Income;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.JobExpense;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.MillageEndJob;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.MillageEndNonJob;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.MillageStartJob;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.MillageStartNonJob;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.TripEnd;
+import static com.github.heronerin.secureroute.events.Event.EventVariety.TripStart;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -96,6 +111,7 @@ public class Event implements Serializable {
     public List<Event> cachedRanges = new ArrayList<>();
     public enum EventVariety{
         Empty,
+        FullTrip,
         ArbitraryNote,
         ArbitraryRangeStart,
         ArbitraryRangeEnd,
@@ -279,6 +295,8 @@ public class Event implements Serializable {
             return R.drawable.pump_icon;
         if (variety == GasEventEnd)
             return R.drawable.graph_up;
+        if (variety == FullTrip)
+            return R.drawable.split_car_icon;
 
         return R.drawable.ic_launcher_foreground;
     }

@@ -5,7 +5,6 @@ import static com.github.heronerin.secureroute.eventViewer.NoteViewer.handleNote
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;

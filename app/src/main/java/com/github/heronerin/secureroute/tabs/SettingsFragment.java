@@ -3,9 +3,6 @@ package com.github.heronerin.secureroute.tabs;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +10,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import androidx.fragment.app.Fragment;
 
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.EventEditUtils;
@@ -159,6 +157,8 @@ public class SettingsFragment extends Fragment {
                 return 1000*60*60*12*3;
             case 5:
                 return 1000*60*60*12*7;
+            default:
+                throw new RuntimeException("uploadIntervalToTimeDiff() received illegal input: " + interval);
         }
     }
 }

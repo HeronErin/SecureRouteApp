@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +17,6 @@ import com.github.heronerin.secureroute.events.Event;
 
 import org.json.JSONArray;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
 public class AddTripFragment extends AbstractAddPage {
@@ -66,7 +61,7 @@ public class AddTripFragment extends AbstractAddPage {
     @Override
     public String getDisplay() {
 //        DataBase.instance.
-        return "Add Trip";
+        return "Start / End Trip";
     }
 
     @Override
