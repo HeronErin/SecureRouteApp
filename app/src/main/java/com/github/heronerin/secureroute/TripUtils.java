@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 
 import androidx.core.app.ActivityCompat;
@@ -93,5 +95,10 @@ public class TripUtils {
         SharedPreferences.Editor e = sp.edit();
         e.putLong("last edited", System.currentTimeMillis());
         e.apply();
+    }
+    public static boolean isConnectedToWifi(Context context) {
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return networkInfo.isConnected();
     }
 }

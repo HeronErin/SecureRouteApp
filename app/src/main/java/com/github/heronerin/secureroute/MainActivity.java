@@ -3,6 +3,7 @@ package com.github.heronerin.secureroute;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     };
     int currentTab = 0;
+    boolean uploading = false;
 
     void onTabClick(View  v){
 
@@ -78,6 +80,45 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
+
+
+
+        // Handle google drive backups
+        if (uploading) return;
+        SharedPreferences settings = getSharedPreferences("settings", Context.MODE_PRIVATE);
+        SharedPreferences info = getSharedPreferences("info", Context.MODE_PRIVATE);
+        if (!settings.getBoolean("autoUpload", false)) return;
+
+        if (!TripUtils.isConnectedToWifi(this) && !settings.getBoolean("autoUploadOnData", false)) return;
+
+        if (info.getLong("last edited", -1) >= info.getLong("last uploaded", 0)) return;
+
+        if (
+                System.currentTimeMillis()-info.getLong("last edited", 0)
+                        > SettingsFragment.uploadIntervalToTimeDiff(settings.getInt("uploadInt", 0))
+        ) return;
+
+        uploading=true;
+        Toast.makeText(this, "Starting backup upload", Toast.LENGTH_SHORT).show();
+        new Thread(()->{
+            try {
+                GoogleDriveHelper.uploadBackup(this).join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            runOnUiThread(()-> {
+                Toast.makeText(this, "Finished backup upload", Toast.LENGTH_LONG).show();
+                SharedPreferences sp = getSharedPreferences("info", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+
+                editor.putLong("last uploaded", System.currentTimeMillis());
+
+                editor.apply();
+                uploading=false;
+            });
+
+        }).start();
+
     }
 
 

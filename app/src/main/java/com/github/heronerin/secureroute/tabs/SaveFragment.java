@@ -82,8 +82,10 @@ public class SaveFragment extends Fragment {
         view.findViewById(R.id.importDB).setOnClickListener(this::onImportDBButtonClick);
         SharedPreferences sp = getContext().getSharedPreferences("info", Context.MODE_PRIVATE);
 
-        String lastEdit = "Last edited at: " + (new Date(sp.getLong("last edited", 0))).toString();
+        String lastEdit = "Last edited at: " + new Date(sp.getLong("last edited", 0));
         ((TextView)view.findViewById(R.id.lastSaved)).setText(lastEdit);
+        String lastUpload = "Last uploaded at: " + new Date(sp.getLong("last uploaded", 0));
+        ((TextView)view.findViewById(R.id.lastUploaded)).setText(lastUpload);
 
         modifyGoogleBtn(view.findViewById(R.id.accountsGoogleBtn));
         view.findViewById(R.id.backUpNow).setOnClickListener((v)->{
@@ -110,7 +112,7 @@ public class SaveFragment extends Fragment {
         else
             button.setOnClickListener((v)->startActivity(new Intent(getContext(), ManageBackups.class)));
     }
-    private void backup(){
+    public void backup(){
         Toast.makeText(getContext(), "Starting backup upload", Toast.LENGTH_SHORT).show();
         new Thread(()->{
             try {
@@ -118,9 +120,15 @@ public class SaveFragment extends Fragment {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            SaveFragment.this.getActivity().runOnUiThread(()->
-                    Toast.makeText(getContext(), "Finished backup upload", Toast.LENGTH_LONG).show()
-            );
+            SaveFragment.this.getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Finished backup upload", Toast.LENGTH_LONG).show();
+                SharedPreferences sp = getContext().getSharedPreferences("info", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+
+                editor.putLong("last uploaded", System.currentTimeMillis());
+
+                editor.apply();
+            });
 
         }).start();
     }

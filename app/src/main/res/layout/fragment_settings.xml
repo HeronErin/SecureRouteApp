@@ -1,20 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tabs.SettingsFragment"
-    android:orientation="vertical" >
+    tools:context=".tabs.SettingsFragment">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
-    <CheckBox
-        android:id="@+id/hasRangeEnds"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Display ranges ends" />
-    <CheckBox
-        android:id="@+id/doGodTransmute"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Allow god transmuting" />
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="GoogleDrive Backups:"
+            android:textSize="20sp" />
+        <CheckBox
+            android:id="@+id/autoUpload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Auto upload" />
+        <CheckBox
+            android:id="@+id/autoUploadOnData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Allow automatic backups on data" />
+        <CheckBox
+            android:id="@+id/autoPrune"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Auto remove old backups" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Amount to keep:" />
+
+        <EditText
+            android:id="@+id/amountOfUploadsToKeep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number" />
+        <Spinner
+            android:id="@+id/timeToUpload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:background="#9F9F9F"
+            android:padding="5dp"
+            android:spinnerMode="dropdown"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Debug:"
+            android:textSize="20sp" />
+
+        <CheckBox
+            android:id="@+id/hasRangeEnds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Display ranges ends" />
+        <CheckBox
+            android:id="@+id/doGodTransmute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Allow god transmuting" />
+    </LinearLayout>
+</ScrollView>
