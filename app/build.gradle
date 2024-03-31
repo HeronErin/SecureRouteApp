@@ -45,9 +45,7 @@ android {
         exclude 'META-INF/*'
 //        exclude 'org/apache/http/**'
     }
-    lint {
-        baseline = file("lint-baseline.xml")
-    }
+
 }
 
 dependencies {
