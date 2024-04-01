@@ -1,5 +1,5 @@
 # Secure Route Tracker
-This is very early **WIP** and is NOT stable. You may lose your database at **ANY** time! This app if for tracking Uber / Doordash / Uber eats income and miles. 
+This app if for tracking Uber / Doordash / Uber eats income and miles. As of now it is in an early alpha, so frequent backups are recommended, but the app is relativily stable now. 
 
 Light                      |  Dark
 :-------------------------:|:-------------------------:
