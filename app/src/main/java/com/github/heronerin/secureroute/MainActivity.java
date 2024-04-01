@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (
                 System.currentTimeMillis()-info.getLong("last edited", 0)
-                        > SettingsFragment.uploadIntervalToTimeDiff(settings.getInt("uploadInt", 0))
+                        < SettingsFragment.uploadIntervalToTimeDiff(settings.getInt("uploadInt", 0))
         ) return;
 
         uploading=true;
