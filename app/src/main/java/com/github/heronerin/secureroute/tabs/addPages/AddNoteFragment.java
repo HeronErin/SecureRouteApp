@@ -108,12 +108,8 @@ public class AddNoteFragment extends AbstractAddPage {
 
         String note = sharedPreferences.getString("noteBox", "");
 
-        Bundle args = this.getArguments();
-        if (args == null)
-            et.setText(note);
-        else{
-            throw new RuntimeException();
-        }
+        et.setText(note);
+
         et.setOnFocusChangeListener((v1, hasFocus) -> {
             SharedPreferences.Editor e = sharedPreferences.edit();
             e.putString("noteBox", ((EditText) v1).getText().toString());
@@ -138,9 +134,6 @@ public class AddNoteFragment extends AbstractAddPage {
 
         SharedPreferences.Editor e = sharedPreferences.edit();
         String jso = data.getStringExtra("json");
-//        if (jso != null)
-        Log.d(getTag(), String.valueOf(data));
-        Log.d(getTag(), jso);
         e.putString("lastImg", jso);
         e.apply();
     }

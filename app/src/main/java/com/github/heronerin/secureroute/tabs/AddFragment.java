@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class AddFragment extends Fragment {
-//    private String[] pleaseSelect = new String[]{"No category selected"};
-//    private String[] rangeSubCategories = new String[]{"Start", "End"};
 
     private List<AbstractAddPage> addPages = getPages();
     private static List<AbstractAddPage> getPages(){
@@ -154,18 +152,18 @@ public class AddFragment extends Fragment {
     public boolean onAddClick() {
         if (currentPage != null){
             if (!currentPage.isValid()){
-                Toast.makeText(this.getContext(), "Please enter the required fields!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Please enter the required fields!", Toast.LENGTH_LONG).show();
                 return false;
             }
             Event event = currentPage.genValidEvent();
             if (event == null){
-                Toast.makeText(this.getContext(), "Error getting event from page, can't add to DB", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Error getting event from page, can't add to DB", Toast.LENGTH_LONG).show();
                 return false;
             }
             if (event.variety == Event.EventVariety.GasEvent){
-                Event e = DataBase.getOrCreate(this.getContext()).getLastGas();
+                Event e = DataBase.getOrCreate(getContext()).getLastGas();
                 if (e != null){
-                    DataBase.getOrCreate(this.getContext()).addEvent(new Event(
+                    DataBase.getOrCreate(getContext()).addEvent(new Event(
                             Event.EventVariety.GasEventEnd,
                             UUID.randomUUID(),
                             event.timeStamp - 1,
@@ -178,9 +176,9 @@ public class AddFragment extends Fragment {
                 }
             }
 
-            DataBase.getOrCreate(this.getContext()).addEvent(event);
+            DataBase.getOrCreate(getContext()).addEvent(event);
 
-            updateNotification(this.getContext());
+            updateNotification(getContext());
 
             currentPage.clearStorage();
 

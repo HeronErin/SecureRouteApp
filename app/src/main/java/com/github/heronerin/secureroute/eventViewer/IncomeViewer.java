@@ -15,7 +15,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
-import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
 
 public class IncomeViewer extends AppCompatActivity {
     Event event;
@@ -37,7 +36,7 @@ public class IncomeViewer extends AppCompatActivity {
         assert extras != null;
 
         event = Event.decodeFromString(extras.getString("event"));
-        handleNoteViewAndImgs(event, this, AddIncomeFragment.class);
+        handleNoteViewAndImgs(event, this);
         TextView amount = findViewById(R.id.spendAmount);
         if (event.variety == Event.EventVariety.Income){
             amount.setTextColor(Color.GREEN);

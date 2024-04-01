@@ -11,7 +11,7 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="83dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +27,7 @@
             android:padding="5sp"
             android:scaleType="fitCenter"
             android:src="@drawable/list_icon"
-            android:translationY="25sp"
+            android:translationY="10dp"
             android:visibility="visible" />
 
         <ImageButton
@@ -40,7 +40,7 @@
             android:padding="5sp"
             android:scaleType="fitCenter"
             android:src="@drawable/graph_up"
-            android:translationY="25sp"
+            android:translationY="10dp"
             android:visibility="visible" />
 
         <ImageButton
@@ -53,7 +53,7 @@
             android:padding="5sp"
             android:scaleType="fitCenter"
             android:src="@drawable/add_icon"
-            android:translationY="5dp"
+            android:translationY="-10dp"
             android:visibility="visible" />
 
         <ImageButton
@@ -66,7 +66,7 @@
             android:padding="5sp"
             android:scaleType="fitCenter"
             android:src="@drawable/gear_icon"
-            android:translationY="25sp"
+            android:translationY="10dp"
             android:visibility="visible" />
 
         <ImageButton
@@ -79,7 +79,7 @@
             android:padding="5sp"
             android:scaleType="fitCenter"
             android:src="@drawable/upload_icon"
-            android:translationY="25sp"
+            android:translationY="10dp"
             android:visibility="visible" />
     </LinearLayout>
 

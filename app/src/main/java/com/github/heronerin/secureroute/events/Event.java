@@ -23,11 +23,13 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.ContextMenu;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.TripUtils;
+import com.github.heronerin.secureroute.eventViewer.FullTripViewer;
 import com.github.heronerin.secureroute.eventViewer.GasRangeViewer;
 import com.github.heronerin.secureroute.eventViewer.IncomeViewer;
 import com.github.heronerin.secureroute.eventViewer.NoteViewer;
@@ -36,6 +38,7 @@ import com.github.heronerin.secureroute.eventViewer.TripViewer;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -158,8 +161,35 @@ public class Event implements Serializable {
         this.noteData = _noteData;
         this.imageData = _imagedata == null ? null :new JsonArrayHolder(_imagedata);
         this.odometer = odometer;
-//        this.imageUri = _imageUri;
     }
+    @NonNull
+    public String getFullTripNote(){
+        try{
+            JSONObject data = new JSONObject(noteData);
+            return data.getString("note");
+        } catch (JSONException e) {
+            return "No note data";
+        }
+    }
+    public double sumFullTripMiles(){
+        try{
+            JSONObject data = new JSONObject(noteData);
+            JSONArray miles = data.getJSONArray("miles");
+            double sum = 0;
+            for(int i = 0; i < miles.length(); i++){
+                String m = miles.getString(i);
+
+                if (m.equals(".")) continue;
+                sum+=Double.valueOf(m);
+            }
+            return sum;
+
+        } catch (JSONException e) {
+            return 0D;
+        }
+    }
+
+
 
     public void setImageData(@Nullable JSONArray imageData) {
         this.imageData = imageData == null ? null :new JsonArrayHolder(imageData);
@@ -269,6 +299,9 @@ public class Event implements Serializable {
                 preview+="Lasting "+(DataBase.instance.getEventById(associatedPair).odometer-odometer)+" miles";
             return preview;
         }
+        if (variety == FullTrip){
+            return "Collection of trips with " + sumFullTripMiles() + " miles.";
+        }
 
 
         return "TODO: Handle this event (" + variety.toString() + ")";
@@ -333,6 +366,8 @@ public class Event implements Serializable {
             return TripViewer.class;
         if (variety == GasEvent)
             return GasRangeViewer.class;
+        if (variety == FullTrip)
+            return FullTripViewer.class;
         return NoteViewer.class;
     }
 

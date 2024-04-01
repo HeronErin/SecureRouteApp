@@ -15,7 +15,6 @@ import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.TripUtils;
 import com.github.heronerin.secureroute.events.Event;
-import com.github.heronerin.secureroute.tabs.addPages.AddIncomeFragment;
 
 import java.util.Calendar;
 import java.util.List;
@@ -71,7 +70,7 @@ public class GasRangeViewer extends AppCompatActivity {
         }
         List<Event> containing = DataBase.getOrCreate(this).getInTimeFrame(event.timeStamp, end);
         event.cachedRanges = containing;
-        long businessMiles = 0;
+        double businessMiles = 0;
         for (Event event2 : containing){
             if (event2.variety != Event.EventVariety.TripEnd) continue;
 
@@ -81,13 +80,16 @@ public class GasRangeViewer extends AppCompatActivity {
             if (event3.timeStamp > end || event3.timeStamp < event.timeStamp) continue;
 
             businessMiles+=event2.odometer-event3.odometer;
-
+        }
+        for (Event event2 : containing){
+            if (event2.variety != Event.EventVariety.FullTrip) continue;
+            businessMiles+=event2.sumFullTripMiles();
         }
         info+="\nBusiness Miles: " + businessMiles;
-        info+="\nBusiness Mile Deductions: " + (Double.valueOf(businessMiles) * mileDeduction(event.timeStamp));
+        info+="\nBusiness Mile Deductions: " + (businessMiles * mileDeduction(event.timeStamp));
         Double buisnessPercent = null;
         if (endEvent != null)
-            info+="\n\nBusiness usage: " +((buisnessPercent = (Double.valueOf(businessMiles) / Double.valueOf(endEvent.odometer - event.odometer))) * 100) + "%";
+            info+="\n\nBusiness usage: " +((buisnessPercent = (businessMiles / Double.valueOf(endEvent.odometer - event.odometer))) * 100) + "%";
         if (eventFollowing != null){
             info += "\nGas event cost following: " + eventFollowing.moneyAmount;
             if (buisnessPercent != null)
@@ -97,6 +99,6 @@ public class GasRangeViewer extends AppCompatActivity {
         tripInfo.setText(info);
 
 
-        handleNoteViewAndImgs(event, this, AddIncomeFragment.class);
+        handleNoteViewAndImgs(event, this);
     }
 }

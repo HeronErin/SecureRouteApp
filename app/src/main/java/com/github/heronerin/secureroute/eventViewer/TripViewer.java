@@ -16,7 +16,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
-import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 
 public class TripViewer extends AppCompatActivity {
     Event event;
@@ -38,7 +37,7 @@ public class TripViewer extends AppCompatActivity {
         assert extras != null;
 
         event = Event.decodeFromString(extras.getString("event"));
-        handleNoteViewAndImgs(event, this, AddNoteFragment.class);
+        handleNoteViewAndImgs(event, this);
 
         if (event.associatedPair == -1){
             ((TextView)findViewById(R.id.tripInfo)).setText("On going trip...\nPlease end this in the add menu\nS: " + event.odometer);

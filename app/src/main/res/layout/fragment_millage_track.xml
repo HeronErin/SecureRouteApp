@@ -17,15 +17,16 @@
         android:textAlignment="viewStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addMile"
         tools:ignore="RtlCompat" />
 
     <ListView
         android:id="@+id/mileList"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/mileEnter"
+        app:layout_constraintBottom_toTopOf="@+id/addImg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/noteField">
@@ -45,11 +46,10 @@
         android:id="@+id/addMile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:ems="10"
+        android:ems="6"
         android:text="Add"
-        app:layout_constraintBottom_toTopOf="@+id/addImg"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/mileEnter"
@@ -58,7 +58,7 @@
         android:layout_marginStart="5dp"
         android:ems="10"
         android:hint="Amount of miles"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         app:layout_constraintBottom_toBottomOf="@+id/addMile"
         app:layout_constraintEnd_toStartOf="@+id/addMile"
         app:layout_constraintStart_toStartOf="parent" />

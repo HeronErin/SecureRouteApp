@@ -29,7 +29,6 @@ import com.github.heronerin.secureroute.ImageManager;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.events.EventArrayAdapter;
-import com.github.heronerin.secureroute.tabs.addPages.AddNoteFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -102,11 +101,15 @@ public class NoteViewer extends AppCompatActivity {
     }
     Event event;
 
-
-    public static void handleNoteViewAndImgs(Event event, AppCompatActivity activity, Class<?> fragmentCls){
+    // Used by many eventViewers
+    public static void handleNoteViewAndImgs(Event event, AppCompatActivity activity){
         ((ImageView)activity.findViewById(R.id.eventVirietyPreview)).setImageResource(event.getIcon());
 
-        ((TextView)activity.findViewById(R.id.noteData)).setText(event.noteData);
+        if (event.variety == Event.EventVariety.FullTrip)
+            ((TextView)activity.findViewById(R.id.noteData)).setText(event.getFullTripNote());
+        else
+            ((TextView)activity.findViewById(R.id.noteData)).setText(event.noteData);
+
         List<ImageManager.ImgTitleCombo> imageComboList = new ArrayList<>();
         ImageAdaptor imageAdaptor = new ImageAdaptor(activity, imageComboList);
 
@@ -128,7 +131,6 @@ public class NoteViewer extends AppCompatActivity {
         ((ListView) activity.findViewById(R.id.imageDisplayHolder)).setAdapter(imageAdaptor);
         if (event.cachedRanges.isEmpty())
             activity.findViewById(R.id.rangesTitle).setVisibility(View.GONE);
-        Log.d("NoteView", "Amount of ranges: "+ event.cachedRanges.size());
         EventArrayAdapter eventArrayAdapter = new EventArrayAdapter(activity, event.cachedRanges, false);
         ((ListView)activity.findViewById(R.id.ranges)).setAdapter(eventArrayAdapter);
 
@@ -155,7 +157,7 @@ public class NoteViewer extends AppCompatActivity {
         assert extras != null;
 
         event = Event.decodeFromString(extras.getString("event"));
-        handleNoteViewAndImgs(event, this, AddNoteFragment.class);
+        handleNoteViewAndImgs(event, this);
 
 
     }
