@@ -74,7 +74,7 @@ public class Event implements Serializable {
             try {
                 jsonArray = new JSONArray(jsonArrayString);
             } catch (JSONException e) {
-                throw new RuntimeException(e);
+                throw new IOException(e);
             }
         }
     }
@@ -193,63 +193,6 @@ public class Event implements Serializable {
 
     public void setImageData(@Nullable JSONArray imageData) {
         this.imageData = imageData == null ? null :new JsonArrayHolder(imageData);
-    }
-
-    public static void applyRanges(List<Event> events, List<Event> ranges){
-        Collections.sort(events, (o1, o2) -> Long.compare(o1.timeStamp, o2.timeStamp));
-        Collections.sort(ranges, (o1, o2) -> Long.compare(o1.timeStamp, o2.timeStamp));
-        int pastColorStart = 0;
-        int eventIndex = 0;
-        int rangeIndex = 0;
-
-        List<Pair<Integer, Integer>> rangeOpensAndColors = new ArrayList<>();
-        List<Pair<Integer, Event>> colorsInUse = new ArrayList<>();
-
-        while (eventIndex < events.size()){
-            Log.w("EventSort", String.valueOf(events.get(0).timeStamp));
-            Event e = events.get(eventIndex);
-            e.cachedRanges.clear();
-
-            while (rangeIndex < ranges.size() && ranges.get(rangeIndex).timeStamp <= events.get(eventIndex).timeStamp){
-                Event range = ranges.get(rangeIndex);
-                if (Event.isRangeStart(range.variety)){
-                    Integer foundColor = null;
-
-                    for (int c = pastColorStart; c < 5+pastColorStart; c++){
-                        if (!colorsInUse.contains(c % 5)){
-                            foundColor = c % 5;
-                            colorsInUse.add(new Pair<>(c % 5, range));
-                            break;
-                        }
-                    }
-                    pastColorStart++;
-
-                    rangeOpensAndColors.add(new Pair<>(range.associatedPair, foundColor));
-                }else if(Event.isRangeEnd(range.variety)){
-                    for (int i = 0; i < rangeOpensAndColors.size(); i++){
-                        if (range.databaseId != -1 && rangeOpensAndColors.get(i).first == range.databaseId){
-                            for (int ii = 0; ii < colorsInUse.size(); ii++){
-                                if (colorsInUse.get(ii).second.associatedPair != range.databaseId) continue;
-                                colorsInUse.remove(ii);
-                                break;
-                            }
-                            rangeOpensAndColors.remove(i);
-                            break;
-                        }
-                    }
-                }
-                rangeIndex++;
-            }
-            Log.e("Color", colorsInUse.toString());
-            for (Pair<Integer, Event> i : colorsInUse){
-                e.rangeCache[i.first] = true;
-                e.cachedRanges.add(i.second);
-            }
-            eventIndex++;
-
-
-        }
-        Collections.reverse(events);
     }
 
     public static final int MAX_PREVIEW_SIZE = 128;

@@ -45,12 +45,11 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
 
         final Event event = eventList.get(position);
 
+        for (int i = 0; i < 5; i++)
+            listItem.findViewById(bars[i]).setVisibility(
+                    event.rangeCache[i] ? View.VISIBLE : View.INVISIBLE
+            );
 
-
-        for (int i = 0; i < 5; i++){
-            if (event.rangeCache[i])
-                listItem.findViewById(bars[i]).setVisibility(View.VISIBLE);
-        }
 
 
         ImageView imageView = listItem.findViewById(R.id.typeIcon);

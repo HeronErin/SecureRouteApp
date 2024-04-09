@@ -22,11 +22,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.github.heronerin.secureroute.events.Event;
+import com.github.heronerin.secureroute.events.EventDataMineUtils;
 import com.github.heronerin.secureroute.tabs.AddFragment;
 import com.github.heronerin.secureroute.tabs.EventList;
 import com.github.heronerin.secureroute.tabs.SaveFragment;
 import com.github.heronerin.secureroute.tabs.SettingsFragment;
 import com.github.heronerin.secureroute.tabs.StatsFragment;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,6 +154,12 @@ public class MainActivity extends AppCompatActivity {
         findViewById(btns[0]).callOnClick();
 
         updateNotification(this);
+
+//        try {
+//            EventDataMineUtils.dataMineFromCursor(DataBase.instance.getReadableDatabase().rawQuery("SELECT * FROM events", new String[0]));
+//        } catch (JSONException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
 

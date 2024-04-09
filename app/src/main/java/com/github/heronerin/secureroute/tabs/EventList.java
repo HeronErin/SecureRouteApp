@@ -15,8 +15,11 @@ import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.events.EventArrayAdapter;
+import com.github.heronerin.secureroute.events.EventDataMineUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class EventList extends Fragment {
@@ -38,15 +41,15 @@ public class EventList extends Fragment {
 
         DataBase db = DataBase.getOrCreate(this.getContext());
 
-        List<Event> eventList = db.getEventsByTime(100, true);
-        List<Event> rangeList = db.getRange(Integer.MAX_VALUE, true);
+        List<Event> eventList = db.getEventsByTime(Integer.MAX_VALUE, true);
+        Collections.sort(eventList, Comparator.comparingLong(o -> o.timeStamp));
 
-        Event.applyRanges(eventList, rangeList);
+        EventDataMineUtils.makeRanges(eventList);
 
         List<Event> filteredEventList = new ArrayList<>();
         for (Event event : eventList)
             if (!event.isRangeEnd(event.variety) || settings.getBoolean("showEnd", false))
-                filteredEventList.add(event);
+                filteredEventList.add(0, event);
 
         eventArrayAdapter = new EventArrayAdapter(
                 this.getContext(),

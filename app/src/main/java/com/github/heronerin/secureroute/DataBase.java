@@ -281,7 +281,7 @@ public class DataBase extends SQLiteOpenHelper {
             }
         }
     }
-    private Event eventFromCursor(Cursor cursor) throws JSONException {
+    public static Event eventFromCursor(Cursor cursor) throws JSONException {
         Event event = new Event(
                 Event.EventVariety.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("variety"))),
                 UUID.fromString(cursor.getString(cursor.getColumnIndexOrThrow("event_id"))),
