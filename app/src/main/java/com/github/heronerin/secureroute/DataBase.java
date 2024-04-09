@@ -289,9 +289,9 @@ public class DataBase extends SQLiteOpenHelper {
                 cursor.getDouble(cursor.getColumnIndexOrThrow("expense_value")),
                 cursor.getInt(cursor.getColumnIndexOrThrow("associated_pair")),
                 cursor.getString(cursor.getColumnIndexOrThrow("note_data")),
-                cursor.getString(cursor.getColumnIndexOrThrow("image_uri")) != null ? new JSONArray(cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))) : null,
+                cursor.isNull(cursor.getColumnIndexOrThrow("image_uri")) ? null : new JSONArray(cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))),
 
-                cursor.getLong(cursor.getColumnIndexOrThrow("odometer"))
+                cursor.isNull(cursor.getColumnIndexOrThrow("odometer")) ? null : cursor.getLong(cursor.getColumnIndexOrThrow("odometer"))
         );
         event.databaseId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
         return event;

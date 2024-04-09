@@ -293,7 +293,7 @@ public class Event implements Serializable {
             return "-$"+ moneyAmount +"\n"+noteDataHandle(noteData);
         if (variety == GasEvent) {
             String preview = "-$" + moneyAmount + " gas fillup \n";
-            if (associatedPair == -1)
+            if (associatedPair == -1 || null == DataBase.instance.getEventById(associatedPair))
                 preview+="Still ongoing";
             else
                 preview+="Lasting "+(DataBase.instance.getEventById(associatedPair).odometer-odometer)+" miles";

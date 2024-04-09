@@ -5,6 +5,7 @@ import static com.github.heronerin.secureroute.eventViewer.NoteViewer.handleNote
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -36,6 +37,8 @@ public class IncomeViewer extends AppCompatActivity {
         assert extras != null;
 
         event = Event.decodeFromString(extras.getString("event"));
+//        Log.d("test", String.valueOf(event.odometer));
+
         handleNoteViewAndImgs(event, this);
         TextView amount = findViewById(R.id.spendAmount);
         if (event.variety == Event.EventVariety.Income){
