@@ -155,11 +155,6 @@ public class MainActivity extends AppCompatActivity {
 
         updateNotification(this);
 
-//        try {
-//            EventDataMineUtils.dataMineFromCursor(DataBase.instance.getReadableDatabase().rawQuery("SELECT * FROM events", new String[0]));
-//        } catch (JSONException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
 

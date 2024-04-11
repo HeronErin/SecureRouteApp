@@ -42,7 +42,7 @@ public class EventList extends Fragment {
         DataBase db = DataBase.getOrCreate(this.getContext());
 
         List<Event> eventList = db.getEventsByTime(Integer.MAX_VALUE, true);
-        Collections.sort(eventList, Comparator.comparingLong(o -> o.timeStamp));
+        Collections.sort(eventList, (o1, o2) -> Long.compare(o1.timeStamp, o2.timeStamp));
 
         EventDataMineUtils.makeRanges(eventList);
 

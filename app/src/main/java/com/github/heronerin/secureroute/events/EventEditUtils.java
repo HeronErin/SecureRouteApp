@@ -90,6 +90,33 @@ public class EventEditUtils {
             return true;
         };
     }
+    public interface DateCallback{
+        void run(Long date);
+    }
+    public static void getDate(Context context, long startingPoint, String title, DateCallback dateCallback){
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(title);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(startingPoint);
+
+        DatePicker datePicker = new DatePicker(context);
+        datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+        alert.setView(datePicker);
+
+        alert.setPositiveButton("Ok", (dialog, whichButton) -> {
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.set(Calendar.YEAR, datePicker.getYear());
+            calendar1.set(Calendar.MONTH, datePicker.getMonth());
+            calendar1.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
+
+            dateCallback.run(calendar1.getTimeInMillis());
+
+        });
+
+        alert.show();
+    }
     public static MenuItem.OnMenuItemClickListener editTime(Context context, Event event){
 
         return item -> {

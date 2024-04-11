@@ -1,6 +1,7 @@
 package com.github.heronerin.secureroute.eventViewer;
 
 import static com.github.heronerin.secureroute.eventViewer.NoteViewer.handleNoteViewAndImgs;
+import static com.github.heronerin.secureroute.events.EventDataMineUtils.mileDeduction;
 
 import android.os.Bundle;
 import android.widget.TextView;
@@ -20,14 +21,6 @@ import java.util.Calendar;
 import java.util.List;
 
 public class GasRangeViewer extends AppCompatActivity {
-//    public static final double mileDeduction = 0.67D;
-    public static double mileDeduction(long timestamp){
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(timestamp);
-        if (c.get(Calendar.YEAR) == 2023)
-            return 65.5D / 100D;
-        return 67D / 100D;
-    }
 
     Event event;
     Event endEvent = null;

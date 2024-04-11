@@ -15,6 +15,7 @@ import android.util.Pair;
 import androidx.annotation.Nullable;
 
 import com.github.heronerin.secureroute.events.Event;
+import com.github.heronerin.secureroute.events.EventDataMineUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -295,6 +296,11 @@ public class DataBase extends SQLiteOpenHelper {
         );
         event.databaseId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
         return event;
+    }
+    public synchronized EventDataMineUtils.DataMineResults dataMineFormRange(long start, long end){
+        return EventDataMineUtils.dataMineFromEvents(
+                eventsBySql("SELECT * FROM events WHERE (timestamp >= ? AND timestamp <= ?)", new String[]{String.valueOf(start), String.valueOf(end)}, Integer.MAX_VALUE)
+        );
     }
     public synchronized List<Pair<String, String>> getAllImageUUIDPairs(){
         List<Pair<String, String>> strings = new ArrayList<>();
