@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.heronerin.secureroute.DataBase;
 import com.github.heronerin.secureroute.R;
+import com.github.heronerin.secureroute.TripUtils;
 import com.github.heronerin.secureroute.events.Event;
 import com.github.heronerin.secureroute.events.EventDataMineUtils;
 import com.github.heronerin.secureroute.events.EventEditUtils;
@@ -130,12 +131,16 @@ public class StatsFragment extends Fragment {
         info += "\nTotal expenses: $" + df.format(dataMineResults.totalExpenses);
         info += "\nMoney spent on gas: $" + df.format(dataMineResults.moneySpentOnGas);
         info += "\nTotal Trips: " + dataMineResults.totalTrips;
+        info += "\nTotal Trip time: " + TripUtils.formatMillisecondsToTime(dataMineResults.workTime);
         info += "\nTotal Miles driven: " + df.format(dataMineResults.totalMillage);
         info += "\nTotal business miles: " + df.format(dataMineResults.businessMillage);
         info += "\nBusiness mile percentage: " + df.format(dataMineResults.businessMilePercent * 100) + "%";
         double deduction = dataMineResults.businessMillage * mileDeduction(start);
         info += "\nTotal business mile deduction: $" + df.format(deduction);
         info += "\nTotal taxable income: $" + df.format(dataMineResults.netProfit - deduction);
+        double hours = ((double) dataMineResults.workTime / 1000 / 60) / 60;
+        info += "\nAverage hourly wage after expenses: $" + df.format(dataMineResults.netProfit / hours) + " per hour";
+        info += "\nAverage hourly wage with expenses: $" + df.format(dataMineResults.grossProfit / hours) + " per hour";
         statsDump.setText(info);
 
 

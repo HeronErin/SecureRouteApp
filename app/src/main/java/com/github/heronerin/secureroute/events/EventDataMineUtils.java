@@ -26,6 +26,7 @@ public class EventDataMineUtils {
         public long maxOdometer = 0;
         public long totalMillage = 0;
         public long businessMillage = 0;
+        public long workTime = 0;
         public double businessMilePercent = 0;
     }
 
@@ -92,8 +93,10 @@ public class EventDataMineUtils {
             }
             if (event.variety == Event.EventVariety.TripStart && event.associatedPair != -1){
                 Event pair = DataBase.instance.getEventById(event.associatedPair);
-                if (pair != null)
+                if (pair != null) {
                     dataMineResults.businessMillage += pair.odometer - event.odometer;
+                    dataMineResults.workTime += pair.timeStamp - event.timeStamp;
+                }
             }
 
             if (event.odometer != null && event.odometer > 0L){
