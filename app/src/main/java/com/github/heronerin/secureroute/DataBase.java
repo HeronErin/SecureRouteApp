@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -142,6 +143,20 @@ public class DataBase extends SQLiteOpenHelper {
         return eventsBySql(
                 "SELECT * FROM events WHERE (timestamp > ? AND timestamp < ?) ORDER BY timestamp DESC",
                 new String[]{String.valueOf(start), String.valueOf(end)},
+                Integer.MAX_VALUE
+        );
+    }
+    public List<Event> getInTimeFrameOfVariety(Event.EventVariety[] varieties, long start, long end){
+        List<String> arguments = new ArrayList<>(Arrays.asList(
+                String.valueOf(start), String.valueOf(end)
+        ));
+
+        for (Event.EventVariety variety : varieties)
+            arguments.add(variety.toString());
+
+        return eventsBySql(
+                "SELECT * FROM events WHERE (timestamp > ? AND timestamp < ? AND variety in ("+StringPlaceHolderGen(varieties.length)+")) ORDER BY timestamp ASC",
+                arguments.toArray(new String[0]),
                 Integer.MAX_VALUE
         );
     }

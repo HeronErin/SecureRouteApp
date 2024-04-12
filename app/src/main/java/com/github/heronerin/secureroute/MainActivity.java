@@ -1,5 +1,8 @@
 package com.github.heronerin.secureroute;
 
+import static com.github.heronerin.secureroute.CsvGen.businessMiles;
+import static com.github.heronerin.secureroute.CsvGen.incomeStatements;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -31,6 +34,7 @@ import com.github.heronerin.secureroute.tabs.StatsFragment;
 
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -154,6 +158,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(btns[0]).callOnClick();
 
         updateNotification(this);
+//        new Thread(()->{
+//            try {
+//                businessMiles(this, 0, Long.MAX_VALUE);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }).start();
 
     }
 
