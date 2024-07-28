@@ -39,8 +39,6 @@ jobs:
         export S_PASSWORD=${{ secrets.KEY_PASSWORD }}
         echo ${{ secrets.KEY_PASSWORD }} > signing_password.txt
         ./gradlew assembleRelease --stacktrace
-    - name: Run tmate
-      uses: mxschmitt/action-tmate@v2
     - name: Sign Release APK
       env:
         RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_PASSWORD }}
